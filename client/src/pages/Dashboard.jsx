@@ -37,26 +37,57 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto' }}>
-      <h2 style={{ marginBottom: 12 }}>Dashboard</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+      </div>
 
-      <form onSubmit={handleCreate} style={{ display: 'grid', gap: 8, margin: '12px 0 24px' }}>
-        <input placeholder="Trip title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Plan a New Adventure</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <input
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              placeholder="Trip title, e.g., 'Summer in Italy'"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 md:col-span-1">
+            <input
+              type="date"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <input
+              type="date"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-1">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-300 ease-in-out font-semibold shadow-md"
+            >
+              Create Trip
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Your Trips</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {trips.map((t) => (
+            <TripCard key={t._id} trip={t} />
+          ))}
         </div>
-        <button type="submit">Create Trip</button>
-      </form>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-        {trips.map((t) => (
-          <TripCard key={t._id} trip={t} />
-        ))}
       </div>
     </div>
   );
 }
-
-

@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const { OAuth2Client } = require('google-auth-library');
 
 exports.register = async (req, res) => {
     try {
@@ -59,6 +60,31 @@ exports.me = async (req, res) => {
         const user = await User.findById(req.user.id).select('_id username email createdAt');
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json({ user });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.googleLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+        if (!idToken) return res.status(400).json({ message: 'Missing idToken' });
+
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const ticket = await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT_ID });
+        const payload = ticket.getPayload();
+        const email = payload.email;
+        const username = payload.name || email.split('@')[0];
+
+        let user = await User.findOne({ email });
+        if (!user) {
+            user = new User({ username, email, passwordHash: 'google-oauth' });
+            await user.save();
+        }
+
+        const jwtPayload = { user: { id: user.id } };
+        const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

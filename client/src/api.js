@@ -33,6 +33,10 @@ export const authApi = {
     const { data } = await apiClient.get('/auth/me');
     return data.user;
   },
+  async google(idToken) {
+    const { data } = await apiClient.post('/auth/google', { idToken });
+    return data;
+  },
 };
 
 export const tripsApi = {
