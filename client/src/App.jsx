@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import './App.css';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import TripView from './pages/TripView.jsx';
+import Layout from './components/Layout.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { useAuth } from './context/AuthContext.jsx';
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppShell() {
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // rudimentary check
+    const token = localStorage.getItem('token');
+    // user will be loaded by AuthProvider via /auth/me
+  }, [user]);
+
+  function logout() {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Layout>
+      {/* auth loading skeleton */}
+      {/* we keep UI simple: could add a global spinner if needed */}
+      <Routes>
+        <Route element={<ProtectedRoute />}> 
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/trips/:id" element={<TripView />} />
+        </Route>
+        <Route path="/login" element={<Login onSuccess={() => navigate('/')} />} />
+        <Route path="/register" element={<Register onSuccess={() => navigate('/login')} />} />
+      </Routes>
+      {user && (
+        <div style={{ position: 'fixed', right: 12, bottom: 12 }}>
+          <button onClick={logout}>Logout</button>
+        </div>
+      )}
+    </Layout>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
+  );
+}
