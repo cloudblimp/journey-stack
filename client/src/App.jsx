@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login.jsx';
@@ -7,16 +7,14 @@ import Dashboard from './pages/Dashboard.jsx';
 import TripView from './pages/TripView.jsx';
 import Layout from './components/Layout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
-import { useAuth } from './context/AuthContext.jsx';
+import { useAuth } from './hooks/useAuth';
 
 function AppShell() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // rudimentary check
-    const token = localStorage.getItem('token');
-    // user will be loaded by AuthProvider via /auth/me
+    // rudimentary check; user will be loaded by AuthProvider via /auth/me
   }, [user]);
 
   function logout() {
@@ -37,11 +35,7 @@ function AppShell() {
         <Route path="/login" element={<Login onSuccess={() => navigate('/')} />} />
         <Route path="/register" element={<Register onSuccess={() => navigate('/login')} />} />
       </Routes>
-      {user && (
-        <div style={{ position: 'fixed', right: 12, bottom: 12 }}>
-          <button onClick={logout}>Logout</button>
-        </div>
-      )}
+      
     </Layout>
   );
 }

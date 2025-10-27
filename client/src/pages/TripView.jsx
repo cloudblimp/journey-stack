@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { tripsApi, journalApi, packingApi } from '../api';
+import { tripsApi, journalApi } from '../api';
 import MapCanvas from '../components/MapCanvas.jsx';
 import JournalEditor from '../components/JournalEditor.jsx';
 import PackingListEditor from '../components/PackingListEditor.jsx';
@@ -9,20 +9,17 @@ export default function TripView() {
   const { id } = useParams();
   const [trip, setTrip] = useState(null);
   const [entries, setEntries] = useState([]);
-  const [packing, setPacking] = useState({ items: [] });
   const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadAll() {
       try {
-        const [t, e, p] = await Promise.all([
+        const [t, e] = await Promise.all([
           tripsApi.get?.(id) || fetchTrip(id),
           journalApi.list(id),
-          packingApi.get(id),
         ]);
         setTrip(t);
         setEntries(e);
-        setPacking(p || { items: [] });
       } catch (err) {
         setError(err?.response?.data?.message || 'Failed to load trip');
       }

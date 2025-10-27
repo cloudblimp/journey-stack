@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { authApi, setAuthToken } from '../api';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth';
 
 export default function GoogleAuthButton({ onSuccess }) {
   const btnRef = useRef(null);
@@ -19,7 +19,7 @@ export default function GoogleAuthButton({ onSuccess }) {
       },
     });
     window.google.accounts.id.renderButton(btnRef.current, { theme: 'outline', size: 'large', width: 250 });
-  }, [btnRef]);
+  }, [onSuccess, setUser]);
 
   return <div ref={btnRef}></div>;
 }
