@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 #manual 
-digital-travel-diary/src/firebase/config.js
+src/firebase/config.js
