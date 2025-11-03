@@ -1,14 +1,14 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext.jsx'; // Import our auth hook
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext.jsx"; // Import our auth hook
 
 // Import Pages
-import Dashboard from './pages/Dashboard.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
+import Dashboard from "./pages/Dashboard.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 
 // Import Components
-import Navbar from './components/Navbar.jsx';
+import Navbar from "./components/Navbar.jsx";
 
 /**
  * A protected route component.
@@ -48,15 +48,15 @@ export default function App() {
           {/* Protected Routes:
             These routes can only be accessed if the user is logged in.
           */}
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          
+
           {/* Public Routes:
             These routes are accessible to everyone.
           */}
@@ -73,4 +73,3 @@ export default function App() {
     </div>
   );
 }
-
