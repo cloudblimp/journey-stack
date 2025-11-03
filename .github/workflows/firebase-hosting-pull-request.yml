@@ -13,7 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check Firebase service account secret
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DIGITAL_TRAVEL_DIARY }}" ]; then
+            echo "ERROR: FIREBASE_SERVICE_ACCOUNT_DIGITAL_TRAVEL_DIARY secret is not set. Add it in repository Settings → Secrets → Actions.";
+            exit 1;
+          fi
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
