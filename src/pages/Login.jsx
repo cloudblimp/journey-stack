@@ -1,16 +1,63 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Use Link for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Use Link for navigation
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { login, signInWithGoogle, resetPassword } = useAuth();
+  const navigate = useNavigate();
+  const [forgotMode, setForgotMode] = useState(false);
+  const [resetMessage, setResetMessage] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('Login logic is not implemented yet.'); // Placeholder
-    console.log('Login attempt with:', email, password);
+    setError(null);
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate('/');
+    } catch (err) {
+      console.error('Login error', err);
+      setError(err.message || 'Failed to log in');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      navigate('/');
+    } catch (err) {
+      console.error('Google sign-in error', err);
+      setError(err.message || 'Google sign-in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    setError(null);
+    setResetMessage(null);
+    if (!email) {
+      return setError('Please enter your email to reset password');
+    }
+    setLoading(true);
+    try {
+      await resetPassword(email);
+      setResetMessage('Password reset email sent. Check your inbox.');
+      setForgotMode(false);
+    } catch (err) {
+      console.error('Reset password error', err);
+      setError(err.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,7 +71,7 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+  <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
               Email
@@ -51,14 +98,53 @@ export default function Login() {
               required
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400"
-          >
-            {loading ? 'Logging In...' : 'Log In'}
-          </button>
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={() => setForgotMode(prev => !prev)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              {forgotMode ? 'Back to login' : 'Forgot password?'}
+            </button>
+            {resetMessage && (
+              <div className="text-sm text-green-600">{resetMessage}</div>
+            )}
+          </div>
+          {!forgotMode ? (
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400"
+            >
+              {loading ? 'Logging In...' : 'Log In'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              disabled={loading}
+              className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 disabled:bg-gray-400"
+            >
+              {loading ? 'Sending...' : 'Send reset email'}
+            </button>
+          )}
         </form>
+        <div className="mt-4">
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 mt-2 border py-2 px-4 rounded-lg hover:bg-gray-100 disabled:opacity-60"
+          >
+            {/* Inline Google logo to avoid external asset dependency */}
+            <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#4285f4" d="M533.5 278.4c0-17.4-1.4-34.1-4.1-50.3H272v95.3h147.5c-6.4 34.7-25 64.1-53.4 83.7v69.6h86.2c50.4-46.4 81.2-115 81.2-198.3z"/>
+              <path fill="#34a853" d="M272 544.3c72.6 0 133.7-24 178.3-65.2l-86.2-69.6c-24 16.1-54.7 25.6-92.1 25.6-70.7 0-130.6-47.8-152-112.1H31.6v70.6C75.9 486 167.6 544.3 272 544.3z"/>
+              <path fill="#fbbc04" d="M120 323.1c-10.7-31.5-10.7-65.6 0-97.1V155.4H31.6c-39.3 77.6-39.3 169.1 0 246.7L120 323.1z"/>
+              <path fill="#ea4335" d="M272 107.7c39 0 74 13.4 101.6 39.6l76.1-76.1C401.1 24.3 342 0 272 0 167.6 0 75.9 58.3 31.6 145.6l88.4 70.4C141.4 155.5 201.3 107.7 272 107.7z"/>
+            </svg>
+            <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
+          </button>
+        </div>
         
         <p className="text-center text-gray-600 text-sm mt-6">
           Don't have an account? 

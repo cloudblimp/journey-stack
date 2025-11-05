@@ -1,5 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 import { auth } from '../firebase/config.js';
 
 // 1. Create the context
@@ -28,10 +36,37 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []); // The empty array [] means this effect runs only once
 
+  // Auth helper functions
+  const signup = (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const login = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const logout = () => {
+    return firebaseSignOut(auth);
+  };
+
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider);
+  };
+
+  const resetPassword = (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
   // The "value" is what we pass down to all child components
   const value = {
     currentUser: user,
-    loading
+    loading,
+    signup,
+    login,
+    logout,
+    signInWithGoogle,
+    resetPassword,
   };
 
   // We don't render the rest of the app until we've finished checking the auth state

@@ -1,20 +1,51 @@
 import React from 'react';
-import { useAuth } from '../contexts/AuthContext.jsx'; // Import our auth hook
+import { useAuth } from '../contexts/AuthContext.jsx';
+import TripList from '../components/TripList';
+import { useNavigate } from 'react-router-dom';
+
+const SAMPLE_TRIPS = [
+  {
+    id: 'bali-1',
+    title: 'Bali Adventure',
+    description: 'Two weeks exploring the beautiful island of Bali',
+    startDate: '2025-01-15',
+    endDate: '2025-01-29',
+    coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=60'
+  },
+  {
+    id: 'swiss-1',
+    title: 'Swiss Alps Hiking',
+    description: 'Mountain hiking adventure through Switzerland',
+    startDate: '2025-02-10',
+    endDate: '2025-02-20',
+    coverImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=60'
+  },
+  {
+    id: 'tokyo-1',
+    title: 'Tokyo City Break',
+    description: "Urban exploration in Japan's vibrant capital",
+    startDate: '2025-03-05',
+    endDate: '2025-03-12',
+    coverImage: 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1200&q=60'
+  }
+];
 
 export default function Dashboard() {
-  const { currentUser } = useAuth(); // Get the current user from our context
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCreateTrip = () => {
+    // For now navigate to a placeholder route or open modal
+    navigate('/trip/new');
+  };
+
+  const handleTripSelect = (tripId) => {
+    navigate(`/trip/${tripId}`);
+  };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 sm:p-8">
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">My Dashboard</h1>
-        <p className="text-xl text-gray-700">
-          Welcome, <span className="font-semibold text-blue-600">{currentUser?.email}</span>!
-        </p>
-        <p className="mt-4 text-gray-600">This is your personal dashboard. Your saved trips will appear here soon.</p>
-        
-        {/* We will add the "Create Trip" form and "Trip List" here in a future step */}
-      </div>
+    <div className="w-full">
+      <TripList trips={SAMPLE_TRIPS} onCreateTrip={handleCreateTrip} onTripSelect={handleTripSelect} />
     </div>
   );
 }

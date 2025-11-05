@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Use Link for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Use Link for navigation
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -7,15 +8,39 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { signup, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null); // Clear previous errors
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
     }
-    setError('Signup logic is not implemented yet.'); // Placeholder
-    console.log('Signup attempt with:', email, password);
+    setLoading(true);
+    try {
+      await signup(email, password);
+      navigate('/');
+    } catch (err) {
+      console.error('Signup error', err);
+      setError(err.message || 'Failed to create account');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      navigate('/');
+    } catch (err) {
+      console.error('Google sign-in error', err);
+      setError(err.message || 'Google sign-in failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,6 +102,23 @@ export default function Signup() {
             {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
+
+        <div className="mt-4">
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 mt-2 border py-2 px-4 rounded-lg hover:bg-gray-100 disabled:opacity-60"
+          >
+            {/* Inline Google logo to avoid external asset dependency */}
+            <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#4285f4" d="M533.5 278.4c0-17.4-1.4-34.1-4.1-50.3H272v95.3h147.5c-6.4 34.7-25 64.1-53.4 83.7v69.6h86.2c50.4-46.4 81.2-115 81.2-198.3z"/>
+              <path fill="#34a853" d="M272 544.3c72.6 0 133.7-24 178.3-65.2l-86.2-69.6c-24 16.1-54.7 25.6-92.1 25.6-70.7 0-130.6-47.8-152-112.1H31.6v70.6C75.9 486 167.6 544.3 272 544.3z"/>
+              <path fill="#fbbc04" d="M120 323.1c-10.7-31.5-10.7-65.6 0-97.1V155.4H31.6c-39.3 77.6-39.3 169.1 0 246.7L120 323.1z"/>
+              <path fill="#ea4335" d="M272 107.7c39 0 74 13.4 101.6 39.6l76.1-76.1C401.1 24.3 342 0 272 0 167.6 0 75.9 58.3 31.6 145.6l88.4 70.4C141.4 155.5 201.3 107.7 272 107.7z"/>
+            </svg>
+            <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
+          </button>
+        </div>
 
         <p className="text-center text-gray-600 text-sm mt-6">
           Already have an account?
