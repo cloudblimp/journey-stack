@@ -1,9 +1,11 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext.jsx"; // Import our auth hook
+import { TripProvider } from "./contexts/TripContext.jsx";
 
 // Import Pages
 import Dashboard from "./pages/Dashboard.jsx";
+import TripDetail from "./pages/TripDetail.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 
@@ -41,10 +43,11 @@ export default function App() {
 
   // Auth state is loaded, render the app
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar /> {/* The Navbar will show on every page */}
-      <main>
-        <Routes>
+    <TripProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar /> {/* The Navbar will show on every page */}
+        <main>
+          <Routes>
           {/* Protected Routes:
             These routes can only be accessed if the user is logged in.
           */}
@@ -53,6 +56,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip/:tripId"
+            element={
+              <ProtectedRoute>
+                <TripDetail />
               </ProtectedRoute>
             }
           />
@@ -71,5 +82,6 @@ export default function App() {
         </Routes>
       </main>
     </div>
+    </TripProvider>
   );
 }

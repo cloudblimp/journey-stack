@@ -23,9 +23,7 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
       {/* Trip Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {trips.map((trip) => (
-          <div key={trip.id} onClick={() => onTripSelect?.(trip.id)}>
-            <TripCard trip={trip} />
-          </div>
+          <TripCard key={trip.id} trip={trip} onTripSelect={onTripSelect} />
         ))}
       </div>
 

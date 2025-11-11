@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTrip } from '../contexts/TripContext.jsx';
 import { FaCalendarAlt } from 'react-icons/fa';
 
 export default function TripCard({ trip }) {
+  const { setSelectedTrip } = useTrip();
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
@@ -13,9 +16,14 @@ export default function TripCard({ trip }) {
     });
   };
 
+  const handleClick = () => {
+    setSelectedTrip(trip);
+  };
+
   return (
     <Link
       to={`/trip/${trip.id}`}
+      onClick={handleClick}
       className="block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
     >
       {/* Image */}

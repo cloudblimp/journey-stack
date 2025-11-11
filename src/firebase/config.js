@@ -1,12 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics"; // Import Analytics
+import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
 
-// Read Firebase configuration from Vite environment variables (recommended).
-// Create a local `.env.local` with VITE_FIREBASE_* variables, or set them in your CI.
-// For a local example see ../.env.local.example
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
@@ -23,36 +20,44 @@ let db;
 let storage;
 let analytics;
 
-// Initialize Firebase
-//const app = initializeApp(firebaseConfig);
-//const analytics = getAnalytics(app);
-
 try {
-  // Basic presence check for the API key. Don't treat a specific key string as a placeholder.
-  // If you have a real key here this check will pass. For production, prefer using
-  // environment variables (see notes below).
+  // Check for API key
   if (!firebaseConfig.apiKey) {
     throw new Error(
-      "Firebase config is missing. Please set your Vite env vars (see .env.local.example) or paste your config into src/firebase/config.js"
+      "Firebase config is missing. Please set your Vite env vars (see .env.local.example)"
     );
   }
 
-  // Initialize all services
+  // Initialize Firebase
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
+
+  // Connect to local emulators when enabled in development
+  // Set VITE_USE_FIREBASE_EMULATOR=true in your .env.local to enable
+  if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
+    try {
+      // Connect to Firestore emulator
+      connectFirestoreEmulator(db, 'localhost', 8080);
+      console.log('Connected to Firebase Firestore emulator at localhost:8080');
+      
+      // default storage emulator host/port is localhost:9199
+      connectStorageEmulator(storage, 'localhost', 9199);
+      console.log('Connected to Firebase Storage emulator at localhost:9199');
+    } catch (err) {
+      console.warn('Failed to connect to emulators:', err);
+    }
+  }
   
-  // Only initialize analytics if measurementId exists
+  // Initialize analytics if measurementId exists
   if (firebaseConfig.measurementId) {
     analytics = getAnalytics(app);
   }
-
 } catch (error) {
   console.error("Firebase initialization error:", error);
-  // We'll let the app render an error message
-  throw error; // Re-throw the error so the app can catch it
+  throw error;
 }
 
-// Export the Firebase services
-export { app, auth, db, storage, analytics };
+// Export initialized services
+export { auth, db, storage, analytics };

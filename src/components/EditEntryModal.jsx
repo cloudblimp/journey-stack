@@ -1,0 +1,268 @@
+  import React, { useState, useEffect } from 'react';
+import { storage } from '../firebase/config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoading, error }) {
+  const { currentUser } = useAuth();
+  const [entryData, setEntryData] = useState({
+    title: '',
+    dateTime: '',
+    location: '',
+    story: '',
+    photoUrl: '',
+    photoFile: null
+  });
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Pre-fill form when entry is passed
+  useEffect(() => {
+    if (entry) {
+      setEntryData({
+        title: entry.title || '',
+        dateTime: entry.dateTime ? new Date(entry.dateTime).toISOString().slice(0, 16) : '',
+        location: entry.location || '',
+        story: entry.story || '',
+        photoUrl: entry.photoUrl || '',
+        photoFile: null
+      });
+    }
+  }, [entry]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEntryData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setEntryData(prev => ({
+        ...prev,
+        photoFile: file
+      }));
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setEntryData(prev => ({
+      ...prev,
+      photoFile: null,
+      photoUrl: ''
+    }));
+  };
+
+  const uploadPhoto = async (file, tripId) => {
+    if (!file || !currentUser) return null;
+    
+    const fileName = `${Date.now()}-${file.name}`;
+    const storageRef = ref(storage, `entry-photos/${currentUser.uid}/${tripId}/${fileName}`);
+    
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    let photoUrl = entryData.photoUrl;
+    
+    // Upload new photo if selected
+    if (entryData.photoFile) {
+      setUploadingPhoto(true);
+      try {
+        photoUrl = await uploadPhoto(entryData.photoFile, entry.tripId);
+      } catch (err) {
+        console.error('Photo upload failed:', err);
+        // Continue with existing photo if upload fails
+      } finally {
+        setUploadingPhoto(false);
+      }
+    }
+    
+    onSave({
+      id: entry.id,
+      title: entryData.title,
+      dateTime: entryData.dateTime,
+      location: entryData.location,
+      story: entryData.story,
+      photoUrl: photoUrl
+    });
+  };
+
+  if (!isOpen || !entry) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Edit Entry</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500"
+            disabled={isLoading}
+          >
+            <span className="sr-only">Close</span>
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title */}
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={entryData.title}
+              onChange={handleChange}
+              placeholder="Give your entry a title..."
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            />
+          </div>
+
+          {/* Date & Time */}
+          <div>
+            <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">
+              Date & Time
+            </label>
+            <input
+              type="datetime-local"
+              id="dateTime"
+              name="dateTime"
+              value={entryData.dateTime}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+              Location
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={entryData.location}
+              onChange={handleChange}
+              placeholder="Where are you?"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            />
+          </div>
+
+          {/* Story */}
+          <div>
+            <label htmlFor="story" className="block text-sm font-medium text-gray-700">
+              Your Story
+            </label>
+            <textarea
+              id="story"
+              name="story"
+              value={entryData.story}
+              onChange={handleChange}
+              placeholder="What happened today? What did you see, feel, and experience?"
+              rows={6}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            />
+          </div>
+
+          {/* Photo Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Photo
+            </label>
+            
+            {/* Current or New Photo Preview */}
+            {(entryData.photoFile || entryData.photoUrl) && (
+              <div className="mb-4 relative">
+                <img 
+                  src={entryData.photoFile ? URL.createObjectURL(entryData.photoFile) : entryData.photoUrl}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-md"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  disabled={isLoading || uploadingPhoto}
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 disabled:opacity-50"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/* Upload Input */}
+            <label className="flex items-center justify-center w-full px-4 py-6 text-sm font-medium text-gray-600 bg-gray-50 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 disabled:opacity-50">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                disabled={isLoading || uploadingPhoto}
+                className="hidden"
+              />
+              <div className="flex flex-col items-center">
+                <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="text-xs text-center">
+                  {uploadingPhoto ? 'Uploading...' : 'Click to upload or replace photo'}
+                </span>
+              </div>
+            </label>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="rounded-md bg-red-50 p-3">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || uploadingPhoto}
+              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center"
+            >
+              {isLoading || uploadingPhoto ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {uploadingPhoto ? 'Uploading Photo...' : 'Saving...'}
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
