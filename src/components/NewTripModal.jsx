@@ -12,6 +12,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
   });
   
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [validationError, setValidationError] = useState(null);
 
   const resetForm = () => {
     setTripData({
@@ -23,16 +24,37 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
       coverImageFile: null
     });
     setPreviewUrl(null);
+    setValidationError(null);
+  };
+
+  const validateDates = (startDate, endDate) => {
+    if (!startDate || !endDate) return null;
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (start > end) {
+      return 'Start date cannot be after end date';
+    }
+    
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate dates
+    const dateError = validateDates(tripData.startDate, tripData.endDate);
+    if (dateError) {
+      setValidationError(dateError);
+      return;
+    }
+    
     try {
       await onCreateTrip(tripData);
       resetForm();
       onClose();
     } catch (err) {
-      // Error will be handled by the parent component
       console.error('Error in form submission:', err);
     }
   };
@@ -53,11 +75,20 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
         setPreviewUrl(reader.result);
       };
       reader.readAsDataURL(file);
+    } else if (name === 'startDate' || name === 'endDate') {
+      const newData = { ...tripData, [name]: value };
+      
+      // Validate dates on change
+      const dateError = validateDates(newData.startDate, newData.endDate);
+      setValidationError(dateError);
+      
+      setTripData(newData);
     } else {
       setTripData(prev => ({
         ...prev,
         [name]: value
       }));
+      setValidationError(null);
     }
   };
 
@@ -91,7 +122,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               value={tripData.title}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
             />
           </div>
 
@@ -106,7 +137,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               value={tripData.destination}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
             />
           </div>
 
@@ -122,7 +153,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                 value={tripData.startDate}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
               />
             </div>
 
@@ -137,7 +168,8 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                 value={tripData.endDate}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+                min={tripData.startDate}
+                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
               />
             </div>
           </div>
@@ -152,7 +184,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               rows={3}
               value={tripData.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
             />
           </div>
 
@@ -200,13 +232,13 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
             </div>
           </div>
 
-          {error && (
+          {(validationError || error) && (
             <div className="rounded-md bg-red-50 p-4">
               <div className="flex">
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-red-800">Error</h3>
                   <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
+                    <p>{validationError || error}</p>
                   </div>
                 </div>
               </div>
@@ -224,7 +256,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || validationError}
               className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center"
             >
               {isLoading ? (

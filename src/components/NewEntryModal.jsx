@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { FaCloudUploadAlt } from 'react-icons/fa';
+import { getCurrentISTDateTime } from '../utils/dateUtils';
 
 export default function NewEntryModal({ isOpen, onClose, onCreateEntry, isLoading, error }) {
   const [entryData, setEntryData] = useState({
     title: '',
-    dateTime: new Date().toISOString().slice(0, 16),
+    dateTime: getCurrentISTDateTime(),
     location: '',
     story: '',
     photoFile: null
@@ -15,7 +16,7 @@ export default function NewEntryModal({ isOpen, onClose, onCreateEntry, isLoadin
   const resetForm = () => {
     setEntryData({
       title: '',
-      dateTime: new Date().toISOString().slice(0, 16),
+      dateTime: getCurrentISTDateTime(),
       location: '',
       story: '',
       photoFile: null

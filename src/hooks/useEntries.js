@@ -10,7 +10,7 @@ export function useEntries() {
   const { currentUser } = useAuth();
 
   const createEntry = useCallback(async (tripId, entryData) => {
-    const { title, dateTime, location, story, photoFile } = entryData;
+    const { title, dateTime, location, story, type, photoFile } = entryData;
 
     if (!currentUser) {
       throw new Error('User must be authenticated to create an entry');
@@ -55,6 +55,7 @@ export function useEntries() {
         dateTime: new Date(dateTime).toISOString(),
         location,
         story,
+        type: type || 'Activity',
         photoUrl,
         tripId,
         userId: currentUser.uid,

@@ -2,6 +2,7 @@
 import { storage } from '../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
+import { convertToIST } from '../utils/dateUtils';
 
 export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoading, error }) {
   const { currentUser } = useAuth();
@@ -20,7 +21,7 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
     if (entry) {
       setEntryData({
         title: entry.title || '',
-        dateTime: entry.dateTime ? new Date(entry.dateTime).toISOString().slice(0, 16) : '',
+        dateTime: entry.dateTime ? convertToIST(entry.dateTime) : '',
         location: entry.location || '',
         story: entry.story || '',
         photoUrl: entry.photoUrl || '',
