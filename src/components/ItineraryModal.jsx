@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { FaTimes, FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import AddActivityModal from './AddActivityModal';
+import EditActivityModal from './EditActivityModal';
 import { useActivities } from '../hooks/useActivities';
 
 export default function ItineraryModal({ isOpen, onClose, trip, activities = [] }) {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [isAddActivityModalOpen, setIsAddActivityModalOpen] = useState(false);
+  const [isEditActivityModalOpen, setIsEditActivityModalOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
   const [checkedEntries, setCheckedEntries] = useState({});
   const { createActivity } = useActivities();
 
@@ -241,7 +244,15 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                         onChange={() => handleCheckboxChange(activity.id)}
                         className="mt-1 w-5 h-5 cursor-pointer" 
                       />
-                      <div className="flex-1">
+                      <button
+                        onClick={() => {
+                          console.log('Clicked on activity:', activity);
+                          setSelectedActivity(activity);
+                          setIsEditActivityModalOpen(true);
+                        }}
+                        type="button"
+                        className="flex-1 text-left hover:opacity-80 transition-opacity"
+                      >
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`px-2 py-1 text-xs font-semibold rounded flex items-center gap-1 ${activityType.color}`}>
                             <span>{activityType.icon}</span>
@@ -252,7 +263,7 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                         <h4 className={`font-semibold text-gray-900 ${isChecked ? 'line-through text-gray-500' : ''}`}>{activity.title}</h4>
                         {activity.description && <p className="text-sm text-gray-600 mt-2">{activity.description}</p>}
                         {activity.location && <p className="text-sm text-gray-600 mt-2">📍 {activity.location}</p>}
-                      </div>
+                      </button>
                     </div>
                   );
                 })
@@ -269,6 +280,19 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
         tripId={trip?.id}
         selectedDate={currentDayKey}
         onAddActivity={handleAddActivity}
+      />
+
+      {/* Edit Activity Modal */}
+      <EditActivityModal
+        isOpen={isEditActivityModalOpen}
+        onClose={() => {
+          setIsEditActivityModalOpen(false);
+          setSelectedActivity(null);
+        }}
+        activity={selectedActivity}
+        onActivityUpdated={() => {
+          // Activities will update automatically via Firestore listener
+        }}
       />
     </div>
   );
