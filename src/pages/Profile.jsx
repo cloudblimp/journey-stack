@@ -4,6 +4,8 @@ import { db, storage } from '../firebase/config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { FaCamera, FaSpinner, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -97,11 +99,12 @@ export default function Profile() {
       });
 
       setProfileImage(null);
-      setMessage('Profile updated successfully! ✅');
-      setTimeout(() => setMessage(''), 3000);
+      toast.success('Profile updated successfully! 👤');
+      setMessage('');
     } catch (err) {
       console.error('Error saving profile:', err);
-      setMessage(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
+      setMessage('');
     } finally {
       setSaving(false);
     }
@@ -114,12 +117,22 @@ export default function Profile() {
   const userInitial = currentUser.email?.[0]?.toUpperCase() || '?';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <motion.div 
+      className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="max-w-2xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-8"
+          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 active:text-blue-800 active:scale-95 mb-8 transition-all duration-75 px-2 py-2 rounded hover:bg-blue-50 active:bg-blue-100"
         >
           <FaArrowLeft className="h-4 w-4" />
           <span>Back</span>
@@ -228,7 +241,7 @@ export default function Profile() {
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

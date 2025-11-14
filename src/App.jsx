@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { useAuth } from "./contexts/AuthContext.jsx"; // Import our auth hook
 import { TripProvider } from "./contexts/TripContext.jsx";
 
@@ -47,6 +48,7 @@ export default function App() {
   // Auth state is loaded, render the app
   return (
     <TripProvider>
+      <Toaster position="top-right" />
       <div className="min-h-screen bg-gray-50">
         <Navbar /> {/* The Navbar will show on every page */}
         <main>

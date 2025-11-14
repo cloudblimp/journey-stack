@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Use Link for navigation
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
@@ -18,10 +20,13 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
+      toast.success('Logged in successfully! 🎉');
       navigate('/');
     } catch (err) {
       console.error('Login error', err);
-      setError(err.message || 'Failed to log in');
+      const errorMsg = err.message || 'Failed to log in';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -32,10 +37,13 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      toast.success('Signed in with Google! 🚀');
       navigate('/');
     } catch (err) {
       console.error('Google sign-in error', err);
-      setError(err.message || 'Google sign-in failed');
+      const errorMsg = err.message || 'Google sign-in failed';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -45,24 +53,38 @@ export default function Login() {
     setError(null);
     setResetMessage(null);
     if (!email) {
+      toast.error('Please enter your email to reset password');
       return setError('Please enter your email to reset password');
     }
     setLoading(true);
     try {
       await resetPassword(email);
+      toast.success('Password reset email sent! 📧');
       setResetMessage('Password reset email sent. Check your inbox.');
       setForgotMode(false);
     } catch (err) {
       console.error('Reset password error', err);
-      setError(err.message || 'Failed to send reset email');
+      const errorMsg = err.message || 'Failed to send reset email';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+    <motion.div 
+      className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="w-full max-w-md p-8 bg-white rounded-lg shadow-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Log In</h2>
         
         {error && (
@@ -114,7 +136,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 transition-all duration-75 font-medium min-h-[48px]"
             >
               {loading ? 'Logging In...' : 'Log In'}
             </button>
@@ -123,7 +145,7 @@ export default function Login() {
               type="button"
               onClick={handleResetPassword}
               disabled={loading}
-              className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 disabled:bg-gray-400"
+              className="w-full bg-yellow-600 text-white py-3 px-4 rounded-lg hover:bg-yellow-700 active:bg-yellow-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 disabled:bg-gray-400 transition-all duration-75 font-medium min-h-[48px]"
             >
               {loading ? 'Sending...' : 'Send reset email'}
             </button>
@@ -153,8 +175,8 @@ export default function Login() {
             Sign Up
           </Link>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

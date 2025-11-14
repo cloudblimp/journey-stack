@@ -240,14 +240,14 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50"
+              className="px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 active:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || uploadingPhoto}
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center"
+              className="px-4 py-3 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 active:bg-gray-950 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center transition-all duration-75 min-h-[44px]"
             >
               {isLoading || uploadingPhoto ? (
                 <>

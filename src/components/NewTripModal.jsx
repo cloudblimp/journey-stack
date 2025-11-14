@@ -1,55 +1,92 @@
-import React, { useState } from 'react';
-import { FaCloudUploadAlt, FaCheckCircle, FaSpinner, FaTimes } from 'react-icons/fa';
+import React, { useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import toast from 'react-hot-toast';
+import { useDropzone } from 'react-dropzone';
+import { Dialog, Transition } from '@headlessui/react';
+import { FaTimes, FaSpinner, FaMapPin, FaCloudUploadAlt } from 'react-icons/fa';
+
+// Zod validation schema
+const tripSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  destination: z.string().min(2, 'Destination must be at least 2 characters'),
+  startDate: z.string().min(1, 'Start date is required'),
+  endDate: z.string().min(1, 'End date is required'),
+  description: z.string().optional()
+}).refine((data) => {
+  const start = new Date(data.startDate);
+  const end = new Date(data.endDate);
+  return start <= end;
+}, {
+  message: 'End date must be on or after start date',
+  path: ['endDate']
+});
 
 export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading, error }) {
-  const [tripData, setTripData] = useState({
-    title: '',
-    destination: '',
-    startDate: '',
-    endDate: '',
-    description: '',
-    coverImageFile: null,
-    locations: []
-  });
-  
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [validationError, setValidationError] = useState(null);
+  const [coverImageFile, setCoverImageFile] = useState(null);
+  const [isDragActive, setIsDragActive] = useState(false);
   const [locationInput, setLocationInput] = useState('');
+  const [locations, setLocations] = useState([]);
   const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
   const [geocodingError, setGeocodingError] = useState(null);
 
-  const resetForm = () => {
-    setTripData({
-      title: '',
-      destination: '',
-      startDate: '',
-      endDate: '',
-      description: '',
-      coverImageFile: null,
-      locations: []
-    });
-    setPreviewUrl(null);
-    setValidationError(null);
-    setLocationInput('');
-    setGeocodingError(null);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
+    resolver: zodResolver(tripSchema)
+  });
 
-  const validateDates = (startDate, endDate) => {
-    if (!startDate || !endDate) return null;
-    
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    if (start > end) {
-      return 'Start date cannot be after end date';
+  // Handle dropzone
+  const onDrop = useCallback(acceptedFiles => {
+    if (acceptedFiles.length > 0) {
+      const file = acceptedFiles[0];
+      
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+
+      setCoverImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+      toast.success('Image selected');
     }
-    
-    return null;
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: false,
+    onDragEnter: () => setIsDragActive(true),
+    onDragLeave: () => setIsDragActive(false)
+  });
+
+  const resetForm = () => {
+    reset();
+    setPreviewUrl(null);
+    setCoverImageFile(null);
+    setLocationInput('');
+    setLocations([]);
+    setGeocodingError(null);
+    setIsDragActive(false);
   };
 
   const handleGetCoordinates = async () => {
     if (!locationInput.trim()) {
-      setGeocodingError('Please enter a location');
+      toast.error('Please enter a location');
       return;
     }
 
@@ -58,349 +95,321 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationInput)}&format=json&limit=1`
       );
       const data = await response.json();
 
-      if (!data || data.length === 0) {
-        setGeocodingError('Location not found. Please try another search.');
-        setIsGeocodingLoading(false);
-        return;
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        const newLocation = {
+          id: Date.now(),
+          name: display_name,
+          lat: parseFloat(lat),
+          lng: parseFloat(lon)
+        };
+
+        setLocations([...locations, newLocation]);
+        setLocationInput('');
+        toast.success(`Location "${display_name.split(',')[0]}" added`);
+      } else {
+        setGeocodingError('Location not found. Please try a different search.');
+        toast.error('Location not found');
       }
-
-      const { lat, lon, display_name } = data[0];
-      const newLocation = {
-        name: display_name || locationInput,
-        lat: parseFloat(lat),
-        lng: parseFloat(lon)
-      };
-
-      setTripData(prev => ({
-        ...prev,
-        locations: [...prev.locations, newLocation]
-      }));
-
-      setLocationInput('');
-      setGeocodingError(null);
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      setGeocodingError('Failed to geocode location. Please try again.');
+    } catch (err) {
+      const message = 'Error geocoding location';
+      setGeocodingError(message);
+      toast.error(message);
+      console.error(err);
     } finally {
       setIsGeocodingLoading(false);
     }
   };
 
-  const handleRemoveLocation = (index) => {
-    setTripData(prev => ({
-      ...prev,
-      locations: prev.locations.filter((_, i) => i !== index)
-    }));
+  const handleRemoveLocation = (id) => {
+    setLocations(locations.filter(loc => loc.id !== id));
+    toast.success('Location removed');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate dates
-    const dateError = validateDates(tripData.startDate, tripData.endDate);
-    if (dateError) {
-      setValidationError(dateError);
-      return;
-    }
-    
+  const onFormSubmit = async (data) => {
     try {
-      await onCreateTrip(tripData);
+      await onCreateTrip({
+        ...data,
+        coverImageFile,
+        locations
+      });
       resetForm();
-      onClose();
+      toast.success('Trip created successfully! 🎉');
     } catch (err) {
-      console.error('Error in form submission:', err);
+      toast.error(err.message || 'Failed to create trip');
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    
-    if (name === 'coverImageFile' && files && files[0]) {
-      const file = files[0];
-      setTripData(prev => ({
-        ...prev,
-        coverImageFile: file
-      }));
-      
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else if (name === 'startDate' || name === 'endDate') {
-      const newData = { ...tripData, [name]: value };
-      
-      // Validate dates on change
-      const dateError = validateDates(newData.startDate, newData.endDate);
-      setValidationError(dateError);
-      
-      setTripData(newData);
-    } else {
-      setTripData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-      setValidationError(null);
-    }
+  const handleCloseModal = () => {
+    resetForm();
+    onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Create New Trip</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <span className="sr-only">Close</span>
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <Transition show={isOpen} as={React.Fragment}>
+      <Dialog as="div" className="relative z-40" onClose={handleCloseModal}>
+        <Transition.Child
+          as={React.Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </Transition.Child>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Trip Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={tripData.title}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="destination" className="block text-sm font-medium text-gray-700">
-              Destination
-            </label>
-            <input
-              type="text"
-              id="destination"
-              name="destination"
-              value={tripData.destination}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                Start Date
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                name="startDate"
-                value={tripData.startDate}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                End Date
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                name="endDate"
-                value={tripData.endDate}
-                onChange={handleChange}
-                required
-                min={tripData.startDate}
-                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={3}
-              value={tripData.description}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="locationInput" className="block text-sm font-medium text-gray-700">
-              Trip Locations (Stops/Waypoints)
-            </label>
-            <div className="mt-1 flex gap-2">
-              <input
-                type="text"
-                id="locationInput"
-                value={locationInput}
-                onChange={(e) => {
-                  setLocationInput(e.target.value);
-                  setGeocodingError(null);
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleGetCoordinates();
-                  }
-                }}
-                placeholder="e.g., Paris, France"
-                className="flex-1 rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
-              />
-              <button
-                type="button"
-                onClick={handleGetCoordinates}
-                disabled={isGeocodingLoading || !locationInput.trim()}
-                className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
-              >
-                {isGeocodingLoading ? (
-                  <>
-                    <FaSpinner className="animate-spin" /> Getting...
-                  </>
-                ) : (
-                  <>📍 Get Coordinates</>
-                )}
-              </button>
-            </div>
-
-            {geocodingError && (
-              <p className="mt-2 text-sm text-red-600">{geocodingError}</p>
-            )}
-
-            {tripData.locations.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Added Locations:</h4>
-                {tripData.locations.map((loc, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3"
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-sm sm:max-w-lg transform overflow-hidden rounded-lg bg-white text-left align-middle shadow-xl transition-all mx-4 sm:mx-0">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                  <Dialog.Title className="text-lg font-semibold text-gray-900">
+                    Plan a New Trip
+                  </Dialog.Title>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    <div className="flex items-center gap-2">
-                      <FaCheckCircle className="text-green-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{loc.name}</p>
-                        <p className="text-xs text-gray-500">{loc.lat.toFixed(4)}, {loc.lng.toFixed(4)}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveLocation(idx)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Cover Image</label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
-              <div className="space-y-1 text-center">
-                {previewUrl ? (
-                  <div className="relative">
-                    <img src={previewUrl} alt="Preview" className="mx-auto h-32 w-full object-cover rounded" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTripData(prev => ({ ...prev, coverImageFile: null }));
-                        setPreviewUrl(null);
-                      }}
-                      className="absolute top-0 right-0 -mr-2 -mt-2 bg-red-100 rounded-full p-1"
-                    >
-                      <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <FaCloudUploadAlt className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label htmlFor="coverImageFile" className="relative cursor-pointer rounded-md font-medium text-gray-900 hover:text-gray-700">
-                        <span>Upload a file</span>
-                        <input
-                          id="coverImageFile"
-                          name="coverImageFile"
-                          type="file"
-                          accept="image/*"
-                          className="sr-only"
-                          onChange={handleChange}
-                        />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
-                    </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {(validationError || error) && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{validationError || error}</p>
-                  </div>
+                    <FaTimes className="h-5 w-5" />
+                  </button>
                 </div>
-              </div>
-            </div>
-          )}
 
-          <div className="flex justify-end space-x-3 mt-5">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading || validationError}
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating...
-                </>
-              ) : (
-                'Create Trip'
-              )}
-            </button>
+                {/* Form */}
+                <form onSubmit={handleSubmit(onFormSubmit)} className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  {/* Title */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Trip Title *
+                    </label>
+                    <input
+                      {...register('title')}
+                      type="text"
+                      placeholder="e.g., European Summer Adventure"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                        errors.title ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                    )}
+                  </div>
+
+                  {/* Destination */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Destination *
+                    </label>
+                    <input
+                      {...register('destination')}
+                      type="text"
+                      placeholder="e.g., Paris, France"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                        errors.destination ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.destination && (
+                      <p className="mt-1 text-sm text-red-600">{errors.destination.message}</p>
+                    )}
+                  </div>
+
+                  {/* Dates Row */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Start Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Start Date *
+                      </label>
+                      <input
+                        {...register('startDate')}
+                        type="date"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                          errors.startDate ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.startDate && (
+                        <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                      )}
+                    </div>
+
+                    {/* End Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        End Date *
+                      </label>
+                      <input
+                        {...register('endDate')}
+                        type="date"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                          errors.endDate ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.endDate && (
+                        <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      {...register('description')}
+                      placeholder="Share details about your trip..."
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    />
+                  </div>
+
+                  {/* Cover Image with Dropzone */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Cover Image
+                    </label>
+                    <div
+                      {...getRootProps()}
+                      className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all min-h-[200px] active:scale-95 ${
+                        isDragActive
+                          ? 'border-blue-500 bg-blue-50 scale-105'
+                          : previewUrl
+                          ? 'border-gray-300'
+                          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 active:border-blue-600 active:bg-blue-100'
+                      }`}
+                    >
+                      <input {...getInputProps()} />
+                      {!previewUrl ? (
+                        <div className="space-y-2">
+                          <FaCloudUploadAlt className="h-10 w-10 text-gray-400 mx-auto" />
+                          <div>
+                            <p className="text-gray-600 font-medium">
+                              {isDragActive ? 'Drop your image here' : 'Drag & drop or click to select'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <img src={previewUrl} alt="Preview" className="max-h-40 mx-auto rounded-md" />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewUrl(null);
+                              setCoverImageFile(null);
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 active:bg-red-700 active:scale-90 transition-all duration-75 shadow-lg hover:shadow-xl min-h-[32px] min-w-[32px] flex items-center justify-center"
+                          >
+                            <FaTimes className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Locations */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Trip Location (Optional)
+                    </label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={locationInput}
+                          onChange={(e) => setLocationInput(e.target.value)}
+                          placeholder="Search for a location..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                          onKeyPress={(e) => e.key === 'Enter' && handleGetCoordinates()}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleGetCoordinates}
+                          disabled={isGeocodingLoading}
+                          className="px-3 py-2 sm:px-4 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 transition-all duration-75 flex items-center gap-2 font-medium min-h-[44px]"
+                        >
+                          {isGeocodingLoading ? <FaSpinner className="animate-spin" /> : <FaMapPin />}
+                          Add
+                        </button>
+                      </div>
+
+                      {geocodingError && (
+                        <p className="text-sm text-red-600">{geocodingError}</p>
+                      )}
+
+                      {/* Locations List */}
+                      {locations.length > 0 && (
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                          {locations.map((loc) => (
+                            <div key={loc.id} className="flex items-center justify-between bg-green-50 border border-green-200 p-2 sm:p-3 rounded-md hover:bg-green-100 active:bg-green-200 transition-all duration-75 min-h-[44px]">
+                              <span className="text-sm text-gray-700 truncate font-medium">{loc.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveLocation(loc.id)}
+                                className="text-red-500 hover:text-red-700 active:text-red-900 active:scale-90 transition-all duration-75 flex-shrink-0 p-1 rounded hover:bg-red-50 active:bg-red-100"
+                              >
+                                <FaTimes className="h-5 w-5 sm:h-4 sm:w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Error Message */}
+                  {error && (
+                    <div className="rounded-md bg-red-50 p-3 border border-red-200">
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      disabled={isLoading}
+                      className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-md hover:bg-gray-100 active:bg-gray-200 active:scale-95 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="px-4 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 flex items-center gap-2 transition-all duration-75 min-h-[44px]"
+                    >
+                      {isLoading ? (
+                        <>
+                          <FaSpinner className="animate-spin h-4 w-4" />
+                          Creating...
+                        </>
+                      ) : (
+                        'Create Trip'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </Dialog>
+    </Transition>
   );
 }
