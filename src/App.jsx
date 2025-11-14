@@ -86,6 +86,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/map"
+            element={
+              <ProtectedRoute>
+                <MapView />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Public Routes:
             These routes are accessible to everyone.
