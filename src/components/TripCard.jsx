@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTrip } from '../contexts/TripContext.jsx';
 import { FaCalendarAlt } from 'react-icons/fa';
 
 export default function TripCard({ trip }) {
   const { setSelectedTrip } = useTrip();
+  const [imageError, setImageError] = useState(false);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -20,6 +21,10 @@ export default function TripCard({ trip }) {
     setSelectedTrip(trip);
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Link
       to={`/trip/${trip.id}`}
@@ -27,11 +32,12 @@ export default function TripCard({ trip }) {
       className="block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
     >
       {/* Image */}
-      <div className="relative h-48 w-full">
+      <div className="relative h-48 w-full bg-gray-200">
         <img
-          src={trip.coverImage || 'https://via.placeholder.com/800x480'}
+          src={imageError || !trip.coverImage ? 'https://via.placeholder.com/800x480' : trip.coverImage}
           alt={trip.title}
           className="w-full h-full object-cover rounded-t-lg"
+          onError={handleImageError}
         />
       </div>
 

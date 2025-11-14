@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTrip } from '../contexts/TripContext';
 import TripLocationMap from '../components/TripLocationMap';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaSpinner } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import 'leaflet/dist/leaflet.css';
 
 export default function MapView() {
   const { currentUser } = useAuth();
-  const { trips } = useTrip();
+  const { trips, loading } = useTrip();
   const navigate = useNavigate();
 
   // Get all trips with locations
@@ -17,6 +18,27 @@ export default function MapView() {
   const allLocations = tripsWithLocations.reduce((acc, trip) => {
     return [...acc, ...trip.locations];
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <FaSpinner className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your trips...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Please log in to view your map</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,10 +91,12 @@ export default function MapView() {
             </div>
 
             {/* Global Map */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold mb-4">All Your Trip Destinations</h2>
-              <TripLocationMap locations={allLocations} />
-            </div>
+            {allLocations.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+                <h2 className="text-xl font-semibold mb-4">All Your Trip Destinations</h2>
+                <TripLocationMap locations={allLocations} />
+              </div>
+            )}
 
             {/* Per-trip breakdown */}
             {tripsWithLocations.length > 1 && (
@@ -82,8 +106,14 @@ export default function MapView() {
                   {tripsWithLocations.map(trip => (
                     <div key={trip.id} className="bg-white rounded-lg border border-gray-200 p-6">
                       <h3 className="text-lg font-semibold mb-2">{trip.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{trip.locations.length} location stops</p>
-                      <TripLocationMap locations={trip.locations} />
+                      <p className="text-sm text-gray-600 mb-4">{trip.locations.length} location stop(s)</p>
+                      {trip.locations.filter(loc => loc && loc.lat && loc.lng).length > 0 ? (
+                        <TripLocationMap locations={trip.locations} />
+                      ) : (
+                        <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <p className="text-gray-500">No valid location coordinates</p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

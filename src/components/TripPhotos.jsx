@@ -10,6 +10,7 @@ export default function TripPhotos({ tripId, photos = [] }) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
   const fileInputRef = useRef(null);
 
   const handlePhotoUpload = async (e) => {
@@ -78,6 +79,10 @@ export default function TripPhotos({ tripId, photos = [] }) {
     setSelectedPhotoIndex(null);
   };
 
+  const handleImageError = (photoId) => {
+    setImageErrors(prev => ({ ...prev, [photoId]: true }));
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
@@ -120,11 +125,18 @@ export default function TripPhotos({ tripId, photos = [] }) {
               className="relative group rounded-lg overflow-hidden bg-gray-100 cursor-pointer"
               onClick={() => setSelectedPhotoIndex(index)}
             >
-              <img
-                src={photo.photoUrl}
-                alt="Trip photo"
-                className="w-full h-32 object-cover group-hover:opacity-75 transition-opacity"
-              />
+              {imageErrors[photo.id] ? (
+                <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-500 text-sm">Image unavailable</span>
+                </div>
+              ) : (
+                <img
+                  src={photo.photoUrl}
+                  alt="Trip photo"
+                  className="w-full h-32 object-cover group-hover:opacity-75 transition-opacity"
+                  onError={() => handleImageError(photo.id)}
+                />
+              )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -159,11 +171,16 @@ export default function TripPhotos({ tripId, photos = [] }) {
             className="flex-1 flex items-center justify-center w-full max-w-5xl max-h-[calc(100vh-200px)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={photos[selectedPhotoIndex].photoUrl}
-              alt={`Trip photo ${selectedPhotoIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
+            {imageErrors[photos[selectedPhotoIndex]?.id] ? (
+              <div className="text-gray-400 text-lg">Image unavailable</div>
+            ) : (
+              <img
+                src={photos[selectedPhotoIndex].photoUrl}
+                alt={`Trip photo ${selectedPhotoIndex + 1}`}
+                className="max-w-full max-h-full object-contain"
+                onError={() => handleImageError(photos[selectedPhotoIndex].id)}
+              />
+            )}
           </div>
 
           {/* Navigation and Counter - Fixed at Bottom */}
