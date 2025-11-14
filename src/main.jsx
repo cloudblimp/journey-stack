@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext.jsx'; // Import our provider
 import App from './App.jsx';
 import './index.css'; // This imports our Tailwind styles
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS for map styling
 
 // We wrap the <App /> component with our providers.
 // The order matters: BrowserRouter should be on the outside.

@@ -10,6 +10,7 @@ import EntryDetailModal from '../components/EntryDetailModal.jsx';
 import EditEntryModal from '../components/EditEntryModal.jsx';
 import ItineraryModal from '../components/ItineraryModal.jsx';
 import TripPhotos from '../components/TripPhotos.jsx';
+import TripLocationMap from '../components/TripLocationMap.jsx';
 import { FaCalendarAlt, FaArrowLeft, FaPlus } from 'react-icons/fa';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=60';
@@ -265,8 +266,16 @@ export default function TripDetail() {
       </div>
 
       {/* Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-0">
+        {/* Trip Location Map - Full Width */}
+        {trip.locations && trip.locations.length > 0 && (
+          <div className="mb-12 relative z-0">
+            <h2 className="text-xl font-semibold mb-4">Trip Stops</h2>
+            <TripLocationMap locations={trip.locations} />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-0">
           {/* Journal Entries - Left Side (2 columns) */}
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">

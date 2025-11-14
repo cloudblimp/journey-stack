@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+/* Leaflet map fixes */
+.leaflet-container {
+  font-family: inherit;
+  outline: 0;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: auto !important;
+}
+
+.leaflet-popup-pane {
+  z-index: 400 !important;
+}
+
+.leaflet-tooltip {
+  z-index: 600 !important;
+}
+
+/* Ensure map control stays within bounds */
+.leaflet-control {
+  z-index: 400 !important;
+  position: relative;
+}
+
+/* Fix for modals appearing behind map */
+.fixed.inset-0 {
+  z-index: 50 !important;
+}
