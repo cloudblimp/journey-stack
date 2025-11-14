@@ -9,6 +9,8 @@ import TripDetail from "./pages/TripDetail.jsx";
 import MapView from "./pages/MapView.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import Profile from "./pages/Profile.jsx";
+import AccountSettings from "./pages/AccountSettings.jsx";
 
 // Import Components
 import Navbar from "./components/Navbar.jsx";
@@ -69,10 +71,18 @@ export default function App() {
             }
           />
           <Route
-            path="/map"
+            path="/profile"
             element={
               <ProtectedRoute>
-                <MapView />
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <AccountSettings />
               </ProtectedRoute>
             }
           />
