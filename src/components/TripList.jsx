@@ -39,14 +39,14 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Travel Journeys</h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Document your adventures around the world</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-text">My Travel Journeys</h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-text/80">Document your adventures around the world</p>
         </div>
         <motion.button
           onClick={onCreateTrip}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-75 min-h-[44px]"
+          className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-3 bg-primary text-white rounded-md hover:bg-primary/90 active:bg-primary/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-75 min-h-[44px]"
         >
           <FaPlus className="h-4 w-4 mr-2" />
           New Trip
@@ -59,12 +59,15 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+        key={`trip-grid-${trips.length}`}
       >
-        {trips.map((trip, index) => (
-          <motion.div key={trip.id} variants={cardVariants}>
-            <TripCard trip={trip} onTripSelect={onTripSelect} />
-          </motion.div>
-        ))}
+        {trips.length > 0 ? (
+          trips.map((trip, index) => (
+            <motion.div key={trip.id} variants={cardVariants}>
+              <TripCard trip={trip} onTripSelect={onTripSelect} />
+            </motion.div>
+          ))
+        ) : null}
       </motion.div>
 
       {/* Empty State */}
@@ -75,8 +78,8 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No trips yet</h3>
-          <p className="text-gray-600">Create your first trip to start documenting your adventures!</p>
+          <h3 className="text-lg font-medium text-text mb-2">No trips yet</h3>
+          <p className="text-text/80">Create your first trip to start documenting your adventures!</p>
         </motion.div>
       )}
     </div>

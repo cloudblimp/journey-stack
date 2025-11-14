@@ -40,9 +40,11 @@ function initLenis() {
   }
 }
 
-// Initialize Lenis on page load
+// Initialize Lenis on page load with 500ms delay to prevent animation conflicts
 if (typeof window !== 'undefined') {
-  initLenis();
+  setTimeout(() => {
+    initLenis();
+  }, 500);
 }
 
 // We wrap the <App /> component with our providers.
