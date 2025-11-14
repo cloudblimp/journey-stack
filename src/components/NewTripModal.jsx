@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCloudUploadAlt } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaCheckCircle, FaSpinner, FaTimes } from 'react-icons/fa';
 
 export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading, error }) {
   const [tripData, setTripData] = useState({
@@ -8,11 +8,15 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
     startDate: '',
     endDate: '',
     description: '',
-    coverImageFile: null
+    coverImageFile: null,
+    locations: []
   });
   
   const [previewUrl, setPreviewUrl] = useState(null);
   const [validationError, setValidationError] = useState(null);
+  const [locationInput, setLocationInput] = useState('');
+  const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
+  const [geocodingError, setGeocodingError] = useState(null);
 
   const resetForm = () => {
     setTripData({
@@ -21,10 +25,13 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
       startDate: '',
       endDate: '',
       description: '',
-      coverImageFile: null
+      coverImageFile: null,
+      locations: []
     });
     setPreviewUrl(null);
     setValidationError(null);
+    setLocationInput('');
+    setGeocodingError(null);
   };
 
   const validateDates = (startDate, endDate) => {
@@ -38,6 +45,56 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
     }
     
     return null;
+  };
+
+  const handleGetCoordinates = async () => {
+    if (!locationInput.trim()) {
+      setGeocodingError('Please enter a location');
+      return;
+    }
+
+    setIsGeocodingLoading(true);
+    setGeocodingError(null);
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`
+      );
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
+        setGeocodingError('Location not found. Please try another search.');
+        setIsGeocodingLoading(false);
+        return;
+      }
+
+      const { lat, lon, display_name } = data[0];
+      const newLocation = {
+        name: display_name || locationInput,
+        lat: parseFloat(lat),
+        lng: parseFloat(lon)
+      };
+
+      setTripData(prev => ({
+        ...prev,
+        locations: [...prev.locations, newLocation]
+      }));
+
+      setLocationInput('');
+      setGeocodingError(null);
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      setGeocodingError('Failed to geocode location. Please try again.');
+    } finally {
+      setIsGeocodingLoading(false);
+    }
+  };
+
+  const handleRemoveLocation = (index) => {
+    setTripData(prev => ({
+      ...prev,
+      locations: prev.locations.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -186,6 +243,76 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
             />
+          </div>
+
+          <div>
+            <label htmlFor="locationInput" className="block text-sm font-medium text-gray-700">
+              Trip Locations (Stops/Waypoints)
+            </label>
+            <div className="mt-1 flex gap-2">
+              <input
+                type="text"
+                id="locationInput"
+                value={locationInput}
+                onChange={(e) => {
+                  setLocationInput(e.target.value);
+                  setGeocodingError(null);
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleGetCoordinates();
+                  }
+                }}
+                placeholder="e.g., Paris, France"
+                className="flex-1 rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm px-3 py-2"
+              />
+              <button
+                type="button"
+                onClick={handleGetCoordinates}
+                disabled={isGeocodingLoading || !locationInput.trim()}
+                className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+              >
+                {isGeocodingLoading ? (
+                  <>
+                    <FaSpinner className="animate-spin" /> Getting...
+                  </>
+                ) : (
+                  <>📍 Get Coordinates</>
+                )}
+              </button>
+            </div>
+
+            {geocodingError && (
+              <p className="mt-2 text-sm text-red-600">{geocodingError}</p>
+            )}
+
+            {tripData.locations.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Added Locations:</h4>
+                {tripData.locations.map((loc, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FaCheckCircle className="text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{loc.name}</p>
+                        <p className="text-xs text-gray-500">{loc.lat.toFixed(4)}, {loc.lng.toFixed(4)}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLocation(idx)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>

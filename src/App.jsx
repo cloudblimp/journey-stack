@@ -6,6 +6,7 @@ import { TripProvider } from "./contexts/TripContext.jsx";
 // Import Pages
 import Dashboard from "./pages/Dashboard.jsx";
 import TripDetail from "./pages/TripDetail.jsx";
+import MapView from "./pages/MapView.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 
@@ -64,6 +65,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <TripDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/map"
+            element={
+              <ProtectedRoute>
+                <MapView />
               </ProtectedRoute>
             }
           />

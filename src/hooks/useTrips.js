@@ -10,7 +10,7 @@ export function useTrips() {
   const { currentUser } = useAuth();
 
   const createTrip = useCallback(async (tripData) => {
-    const { title, destination, startDate, endDate, description, coverImageFile } = tripData;
+    const { title, destination, startDate, endDate, description, coverImageFile, locations } = tripData;
     
     if (!currentUser) {
       throw new Error('User must be authenticated to create a trip');
@@ -53,20 +53,21 @@ export function useTrips() {
       }
 
       // Create trip document
-      const tripData = {
+      const tripDataDoc = {
         title,
         destination,
         startDate,
         endDate,
         description,
         coverImage: coverImageUrl,
+        locations: locations || [],
         userId: currentUser.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      const docRef = await addDoc(collection(db, 'trips'), tripData);
-      return { id: docRef.id, ...tripData };
+      const docRef = await addDoc(collection(db, 'trips'), tripDataDoc);
+      return { id: docRef.id, ...tripDataDoc };
     } catch (err) {
       setError(err.message);
       throw err;
