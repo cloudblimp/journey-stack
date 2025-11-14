@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { collection, onSnapshot, query, where, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useTrip } from '../contexts/TripContext.jsx';
 import { useEntries } from '../hooks/useEntries.js';
 import { db } from '../firebase/config';
@@ -14,6 +16,19 @@ import TripLocationMap from '../components/TripLocationMap.jsx';
 import { FaCalendarAlt, FaArrowLeft, FaPlus } from 'react-icons/fa';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=60';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+};
 
 export default function TripDetail() {
   const { tripId } = useParams();
@@ -170,8 +185,10 @@ export default function TripDetail() {
       await createEntry(trip.id, entryData);
       // Firestore listener will automatically update entries
       setIsModalOpen(false);
+      toast.success('Entry created successfully! 📝');
     } catch (err) {
       console.error('Failed to create entry:', err);
+      toast.error(`Failed to create entry: ${err.message}`);
     }
   };
 
@@ -191,9 +208,10 @@ export default function TripDetail() {
       await deleteDoc(doc(db, 'entries', entryId));
       setEntries(prev => prev.filter(e => e.id !== entryId));
       setIsDetailModalOpen(false);
-      console.log('Entry deleted successfully');
+      toast.success('Entry deleted successfully! 🗑️');
     } catch (err) {
       console.error('Failed to delete entry:', err);
+      toast.error(`Failed to delete entry: ${err.message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -222,9 +240,10 @@ export default function TripDetail() {
         updatedAt: serverTimestamp()
       });
       setIsEditModalOpen(false);
-      console.log('Entry updated successfully');
+      toast.success('Entry updated successfully! ✏️');
     } catch (err) {
       console.error('Failed to update entry:', err);
+      toast.error(`Failed to update entry: ${err.message}`);
     } finally {
       setIsUpdating(false);
     }
@@ -287,16 +306,23 @@ export default function TripDetail() {
                 <FaPlus className="mr-2 h-4 w-4" /> New Entry
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {entries.length === 0 ? (
-                <div className="rounded-lg border border-gray-200 bg-white p-4 text-gray-500">
+                <motion.div variants={itemVariants} className="rounded-lg border border-gray-200 bg-white p-4 text-gray-500">
                   No entries yet. Create your first one!
-                </div>
+                </motion.div>
               ) : (
                 entries.map((entry) => (
-                  <div 
+                  <motion.div 
                     key={entry.id} 
+                    variants={itemVariants}
                     onClick={() => handleEntryCardClick(entry)}
+                    whileHover={{ y: -4 }}
                     className="rounded-lg border border-gray-200 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     {entry.photoUrl && (
@@ -312,10 +338,10 @@ export default function TripDetail() {
                       </p>
                       <p className="text-sm text-gray-700 line-clamp-3">{entry.story}</p>
                     </div>
-                  </div>
+                    </motion.div>
                 ))
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Trip Photos - Right Side (1 column) */}

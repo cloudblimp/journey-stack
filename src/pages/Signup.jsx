@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Use Link for navigation
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Signup() {
@@ -13,17 +15,21 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
     if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
       return setError('Passwords do not match');
     }
     setLoading(true);
     try {
       await signup(email, password);
+      toast.success('Account created successfully! 🎉');
       navigate('/');
     } catch (err) {
       console.error('Signup error', err);
-      setError(err.message || 'Failed to create account');
+      const errorMsg = err.message || 'Failed to create account';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -34,18 +40,31 @@ export default function Signup() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      toast.success('Signed up with Google! 🚀');
       navigate('/');
     } catch (err) {
       console.error('Google sign-in error', err);
-      setError(err.message || 'Google sign-in failed');
+      const errorMsg = err.message || 'Google sign-in failed';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+    <motion.div 
+      className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="w-full max-w-md p-8 bg-white rounded-lg shadow-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Sign Up</h2>
 
         {error && (
@@ -97,7 +116,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400"
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 transition-all duration-75 font-medium min-h-[48px]"
           >
             {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
@@ -107,7 +126,7 @@ export default function Signup() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 mt-2 border py-2 px-4 rounded-lg hover:bg-gray-100 disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 mt-2 border py-3 px-4 rounded-lg hover:bg-gray-100 active:bg-gray-200 active:scale-95 disabled:opacity-60 transition-all duration-75 font-medium min-h-[48px]"
           >
             {/* Inline Google logo to avoid external asset dependency */}
             <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
@@ -126,8 +145,8 @@ export default function Signup() {
             Log In
           </Link>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

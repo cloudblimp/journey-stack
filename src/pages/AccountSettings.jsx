@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
   updatePassword,
   updateEmail,
@@ -8,8 +10,7 @@ import {
   EmailAuthProvider,
   deleteUser as firebaseDeleteUser
 } from 'firebase/auth';
-import { FaArrowLeft, FaExclamationTriangle, FaSync } from 'react-icons/fa';
-import { cleanupBrokenImageURLs } from '../utils/cleanupImageURLs';
+import { FaArrowLeft, FaExclamationTriangle } from 'react-icons/fa';
 
 export default function AccountSettings() {
   const { currentUser, logout } = useAuth();
@@ -25,7 +26,6 @@ export default function AccountSettings() {
   const [loadingPassword, setLoadingPassword] = useState(false);
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const [loadingCleanup, setLoadingCleanup] = useState(false);
   
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -43,42 +43,27 @@ export default function AccountSettings() {
       await reauthenticateWithCredential(currentUser, credential);
       return true;
     } catch (err) {
-      showMessage('Invalid password', 'error');
+      toast.error('Invalid password');
       return false;
     }
   };
 
-  // Cleanup broken image URLs
-  const handleCleanupImageURLs = async () => {
-    if (window.confirm('This will remove broken image URLs from your trips. Continue?')) {
-      setLoadingCleanup(true);
-      try {
-        await cleanupBrokenImageURLs();
-        showMessage('Successfully cleaned up broken image URLs! ✅');
-      } catch (err) {
-        showMessage(`Cleanup failed: ${err.message}`, 'error');
-      } finally {
-        setLoadingCleanup(false);
-      }
-    }
-  };
-
-  // Change Password
+  // Reauthenticate user
   const handleChangePassword = async (e) => {
     e.preventDefault();
     
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showMessage('All fields are required', 'error');
+      toast.error('All fields are required');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      showMessage('New passwords do not match', 'error');
+      toast.error('New passwords do not match');
       return;
     }
 
     if (newPassword.length < 6) {
-      showMessage('New password must be at least 6 characters', 'error');
+      toast.error('New password must be at least 6 characters');
       return;
     }
 
@@ -87,7 +72,10 @@ export default function AccountSettings() {
     try {
       // Reauthenticate
       const isValid = await reauthenticate(currentPassword);
-      if (!isValid) return;
+      if (!isValid) {
+        setLoadingPassword(false);
+        return;
+      }
 
       // Update password
       await updatePassword(currentUser, newPassword);
@@ -95,10 +83,10 @@ export default function AccountSettings() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      showMessage('Password changed successfully! ✅');
+      toast.success('Password changed successfully! 🔒');
     } catch (err) {
       console.error('Error changing password:', err);
-      showMessage(`Error: ${err.message}`, 'error');
+      toast.error(`Error: ${err.message}`);
     } finally {
       setLoadingPassword(false);
     }
@@ -188,7 +176,7 @@ export default function AccountSettings() {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-8"
+          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 active:text-blue-800 active:scale-95 mb-8 transition-all duration-75 px-2 py-2 rounded hover:bg-blue-50 active:bg-blue-100"
         >
           <FaArrowLeft className="h-4 w-4" />
           <span>Back</span>
@@ -299,32 +287,6 @@ export default function AccountSettings() {
             </form>
           </div>
 
-          {/* Data Cleanup Section */}
-          <div className="mb-10 pb-10 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Data Maintenance</h2>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <div className="flex items-start space-x-4">
-                <FaSync className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Clean Up Broken Image URLs</h3>
-                  
-                  <p className="text-sm text-blue-700 mb-4">
-                    If you're seeing errors loading trip cover images, this will remove broken image URLs from your database. This is safe and won't delete your trips.
-                  </p>
-
-                  <button
-                    onClick={handleCleanupImageURLs}
-                    disabled={loadingCleanup}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <FaSync className={`h-4 w-4 ${loadingCleanup ? 'animate-spin' : ''}`} />
-                    <span>{loadingCleanup ? 'Cleaning up...' : 'Clean Up Image URLs'}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="flex items-start space-x-4">
               <FaExclamationTriangle className="h-6 w-6 text-red-600 mt-1 flex-shrink-0" />
