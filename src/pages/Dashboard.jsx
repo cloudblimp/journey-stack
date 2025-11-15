@@ -43,18 +43,15 @@ export default function Dashboard() {
   };
 
   return (
-      <div className="w-full relative bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 min-h-screen overflow-hidden">
+      <div className="w-full relative bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 min-h-screen flex flex-col">
       {/* Animated background - positioned absolutely, stays behind content */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 z-0">
         <AnimatedDiaryBackground />
       </div>
       
-      {/* Content layer - background scrollable only when modal is closed */}
-      <div className={`relative z-10 h-screen overflow-hidden ${isModalOpen ? 'pointer-events-none' : ''}`}>
-        {/* TripList with scrolling */}
-        <div className="bg-white/90 backdrop-blur-sm h-full overflow-y-auto">
-          <TripList trips={trips} onCreateTrip={handleCreateTrip} onTripSelect={handleTripSelect} />
-        </div>
+      {/* Content layer - scrollable */}
+      <div className={`relative z-10 w-full flex-1 overflow-y-auto ${isModalOpen ? 'pointer-events-none' : ''}`}>
+        <TripList trips={trips} onCreateTrip={handleCreateTrip} onTripSelect={handleTripSelect} />
       </div>
       
       {/* Modal layer - fixed positioning, always interactive */}
