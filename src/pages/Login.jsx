@@ -91,9 +91,7 @@ export default function Login() {
           <div className="p-3 bg-red-100 text-red-700 rounded-md mb-4">
             {error}
           </div>
-        )}
-
-  <form onSubmit={handleSubmit}>
+        )}  <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
               Email
@@ -124,7 +122,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => setForgotMode(prev => !prev)}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline transition-colors"
             >
               {forgotMode ? 'Back to login' : 'Forgot password?'}
             </button>

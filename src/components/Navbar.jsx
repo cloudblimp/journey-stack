@@ -35,13 +35,18 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           {/* Logo / App Name */}
           <div className="flex">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-lg sm:text-2xl font-bold text-gray-900">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+              <img 
+                src="/journeyStack-logo-t.svg"
+                alt="JourneyStack Logo"
+                className="h-8 w-8 sm:h-10 sm:w-10"
+              />
+              <span className="text-lg sm:text-2xl font-bold text-white">
                 journeyStack
               </span>
             </Link>
@@ -54,8 +59,8 @@ export default function Navbar() {
                 to="/"
                 className={`hidden sm:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
                   isActive('/') 
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-700 hover:text-blue-600 active:text-blue-700'
+                    ? 'text-white font-semibold bg-white/20'
+                    : 'text-white hover:bg-white/10 active:bg-white/20'
                 }`}
               >
                 <FaSuitcase className="h-4 w-4" />
@@ -66,8 +71,8 @@ export default function Navbar() {
                 to="/map"
                 className={`hidden sm:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
                   isActive('/map')
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-700 hover:text-blue-600 active:text-blue-700'
+                    ? 'text-white font-semibold bg-white/20'
+                    : 'text-white hover:bg-white/10 active:bg-white/20'
                 }`}
               >
                 <FaMap className="h-4 w-4" />
@@ -77,7 +82,7 @@ export default function Navbar() {
               {/* User Menu with Headless UI */}
               <Menu as="div" className="relative ml-3">
                 <div>
-                  <Menu.Button className="h-10 w-10 sm:h-8 sm:w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-75">
+                  <Menu.Button className="h-10 w-10 sm:h-8 sm:w-8 rounded-full bg-white text-emerald-600 flex items-center justify-center text-sm font-medium hover:bg-white/90 active:bg-white/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-75">
                     {userInitial}
                   </Menu.Button>
                 </div>
@@ -156,13 +161,13 @@ export default function Navbar() {
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Link
                 to="/login"
-                className="text-gray-700 hover:text-blue-600 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 active:text-blue-700"
+                className="text-white hover:bg-white/10 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 active:bg-white/20"
               >
                 Log In
               </Link>
               <Link
                 to="/signup"
-                className="bg-blue-600 text-white px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-blue-700 active:bg-blue-800 active:scale-95 min-h-[44px] transition-all duration-75"
+                className="bg-white text-emerald-600 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-white/90 active:bg-white/80 active:scale-95 min-h-[44px] transition-all duration-75"
               >
                 Sign Up
               </Link>

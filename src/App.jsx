@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./contexts/AuthContext.jsx"; // Import our auth hook
@@ -12,6 +12,7 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import AccountSettings from "./pages/AccountSettings.jsx";
+import SplashScreen from "./pages/SplashScreen.jsx";
 
 // Import Components
 import Navbar from "./components/Navbar.jsx";
@@ -35,6 +36,26 @@ function ProtectedRoute({ children }) {
  */
 export default function App() {
   const { loading } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+
+  // Check if splash screen has been shown in this session
+  useEffect(() => {
+    const hasSeenSplashThisSession = sessionStorage.getItem('splashShown');
+    if (hasSeenSplashThisSession) {
+      setShowSplash(false);
+    }
+  }, []);
+
+  const handleSplashComplete = () => {
+    // Mark splash as shown in this session (will reset on browser restart)
+    sessionStorage.setItem('splashShown', 'true');
+    setShowSplash(false);
+  };
+
+  // Show splash screen on first visit (or after app restart)
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
 
   // Show a loading spinner or message while Firebase is checking auth state
   if (loading) {

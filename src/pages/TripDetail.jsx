@@ -13,9 +13,8 @@ import EditEntryModal from '../components/EditEntryModal.jsx';
 import ItineraryModal from '../components/ItineraryModal.jsx';
 import TripPhotos from '../components/TripPhotos.jsx';
 import TripLocationMap from '../components/TripLocationMap.jsx';
+import TripDetailHeroPlaceholder from '../components/TripDetailHeroPlaceholder.jsx';
 import { FaCalendarAlt, FaArrowLeft, FaPlus } from 'react-icons/fa';
-
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=60';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -166,8 +165,7 @@ export default function TripDetail() {
     title: 'Loading...',
     description: 'Trip details coming soon...',
     startDate: new Date('2025-01-01'),
-    endDate: new Date('2025-01-07'),
-    coverImage: FALLBACK_IMAGE
+    endDate: new Date('2025-01-07')
   };
 
   const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -253,7 +251,11 @@ export default function TripDetail() {
     <div className="min-h-screen">
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden">
-        <img src={trip.coverImage || FALLBACK_IMAGE} alt={trip.title} className="w-full h-full object-cover" />
+        {trip.coverImage ? (
+          <img src={trip.coverImage} alt={trip.title} className="w-full h-full object-cover" />
+        ) : (
+          <TripDetailHeroPlaceholder />
+        )}
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Back button - top left */}
@@ -268,7 +270,7 @@ export default function TripDetail() {
         <div className="absolute top-4 right-4 z-20">
           <button 
             onClick={() => setIsItineraryModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-900 transition-colors shadow-md"
+            className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-100 rounded-lg text-sm font-medium text-text transition-colors shadow-md"
           >
             <FaCalendarAlt className="mr-2" /> View Itinerary
           </button>
@@ -313,7 +315,7 @@ export default function TripDetail() {
               animate="visible"
             >
               {entries.length === 0 ? (
-                <motion.div variants={itemVariants} className="rounded-lg border border-gray-200 bg-white p-4 text-gray-500">
+                <motion.div variants={itemVariants} className="rounded-lg border border-white/20 bg-white p-4 text-text/70">
                   No entries yet. Create your first one!
                 </motion.div>
               ) : (
@@ -323,20 +325,20 @@ export default function TripDetail() {
                     variants={itemVariants}
                     onClick={() => handleEntryCardClick(entry)}
                     whileHover={{ y: -4 }}
-                    className="rounded-lg border border-gray-200 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                    className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     {entry.photoUrl && (
                       <img src={entry.photoUrl} alt={entry.title} className="w-full h-48 object-cover" />
                     )}
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-1">{entry.title}</h3>
+                      <h3 className="font-semibold text-text mb-1">{entry.title}</h3>
                       {entry.location && (
-                        <p className="text-sm text-gray-600 mb-2">📍 {entry.location}</p>
+                        <p className="text-sm text-text/80 mb-2">📍 {entry.location}</p>
                       )}
-                      <p className="text-sm text-gray-500 mb-3">
+                      <p className="text-sm text-text/70 mb-3">
                         {new Date(entry.dateTime).toLocaleString()}
                       </p>
-                      <p className="text-sm text-gray-700 line-clamp-3">{entry.story}</p>
+                      <p className="text-sm text-text line-clamp-3">{entry.story}</p>
                     </div>
                     </motion.div>
                 ))
