@@ -308,42 +308,57 @@ export default function TripDetail() {
                 <FaPlus className="mr-2 h-4 w-4" /> New Entry
               </button>
             </div>
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {entries.length === 0 ? (
-                <motion.div variants={itemVariants} className="rounded-lg border border-white/20 bg-white p-4 text-text/70">
-                  No entries yet. Create your first one!
-                </motion.div>
-              ) : (
-                entries.map((entry) => (
-                  <motion.div 
-                    key={entry.id} 
-                    variants={itemVariants}
-                    onClick={() => handleEntryCardClick(entry)}
-                    whileHover={{ y: -4 }}
-                    className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    {entry.photoUrl && (
-                      <img src={entry.photoUrl} alt={entry.title} className="w-full h-48 object-cover" />
-                    )}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-text mb-1">{entry.title}</h3>
-                      {entry.location && (
-                        <p className="text-sm text-text/80 mb-2">📍 {entry.location}</p>
-                      )}
-                      <p className="text-sm text-text/70 mb-3">
-                        {new Date(entry.dateTime).toLocaleString()}
-                      </p>
-                      <p className="text-sm text-text line-clamp-3">{entry.story}</p>
+            {entriesLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[...Array(2)].map((_, i) => (
+                  <div key={`skeleton-${i}`} className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md animate-pulse">
+                    <div className="w-full h-48 bg-gray-300" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                      <div className="h-3 bg-gray-200 rounded w-full" />
                     </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {entries.length === 0 ? (
+                  <motion.div variants={itemVariants} className="rounded-lg border border-white/20 bg-white p-4 text-text/70">
+                    No entries yet. Create your first one!
+                  </motion.div>
+                ) : (
+                  entries.map((entry) => (
+                    <motion.div 
+                      key={entry.id} 
+                      variants={itemVariants}
+                      onClick={() => handleEntryCardClick(entry)}
+                      whileHover={{ y: -4 }}
+                      className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                    >
+                      {entry.photoUrl && (
+                        <img src={entry.photoUrl} alt={entry.title} className="w-full h-48 object-cover" />
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-text mb-1">{entry.title}</h3>
+                        {entry.location && (
+                          <p className="text-sm text-text/80 mb-2">📍 {entry.location}</p>
+                        )}
+                        <p className="text-sm text-text/70 mb-3">
+                          {new Date(entry.dateTime).toLocaleString()}
+                        </p>
+                        <p className="text-sm text-text line-clamp-3">{entry.story}</p>
+                      </div>
                     </motion.div>
-                ))
-              )}
-            </motion.div>
+                  ))
+                )}
+              </motion.div>
+            )}
           </div>
 
           {/* Trip Photos - Right Side (1 column) */}
