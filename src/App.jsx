@@ -12,6 +12,7 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import AccountSettings from "./pages/AccountSettings.jsx";
+import TripSettings from "./pages/TripSettings.jsx";
 import SplashScreen from "./pages/SplashScreen.jsx";
 
 // Import Components
@@ -106,6 +107,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AccountSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip-settings"
+            element={
+              <ProtectedRoute>
+                <TripSettings />
               </ProtectedRoute>
             }
           />
