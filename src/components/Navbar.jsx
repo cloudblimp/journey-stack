@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { FaSuitcase, FaMap, FaUser, FaCog, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaSuitcase, FaMap, FaUser, FaCogs, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth();
@@ -126,8 +126,23 @@ export default function Navbar() {
                             active ? 'bg-gray-100' : ''
                           } hover:bg-gray-50 active:bg-gray-200 active:scale-95 transition-all duration-75`}
                         >
-                          <FaCog className="h-4 w-4 text-gray-600" />
+                          <FaCogs className="h-4 w-4 text-gray-600" />
                           <span>Account Settings</span>
+                        </Link>
+                      )}
+                    </Menu.Item>
+
+                    {/* Trip Settings */}
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/trip-settings"
+                          className={`flex items-center space-x-3 px-4 py-3 text-sm min-h-[48px] ${
+                            active ? 'bg-gray-100' : ''
+                          } hover:bg-gray-50 active:bg-gray-200 active:scale-95 transition-all duration-75`}
+                        >
+                          <FaCogs className="h-4 w-4 text-gray-600" />
+                          <span>Trip Settings</span>
                         </Link>
                       )}
                     </Menu.Item>

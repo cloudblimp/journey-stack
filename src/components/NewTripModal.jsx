@@ -11,7 +11,10 @@ import { FaTimes, FaSpinner, FaMapPin, FaCloudUploadAlt } from 'react-icons/fa';
 const tripSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   destination: z.string().min(2, 'Destination must be at least 2 characters'),
-  startDate: z.string().min(1, 'Start date is required'),
+  startDate: z.string().min(1, 'Start date is required').refine((date) => {
+    const year = new Date(date).getFullYear();
+    return year > 1949;
+  }, 'Start date year must be after 1949'),
   endDate: z.string().min(1, 'End date is required'),
   description: z.string().optional()
 }).refine((data) => {
@@ -175,15 +178,15 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-sm sm:max-w-lg transform overflow-hidden rounded-lg bg-white text-left align-middle shadow-xl transition-all mx-4 sm:mx-0">
+              <Dialog.Panel className="w-full max-w-sm sm:max-w-lg transform overflow-hidden rounded-xl bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 text-left align-middle shadow-2xl transition-all mx-4 sm:mx-0">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                  <Dialog.Title className="text-lg font-semibold text-gray-900">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/20">
+                  <Dialog.Title className="text-lg font-semibold text-white">
                     Plan a New Trip
                   </Dialog.Title>
                   <button
                     onClick={handleCloseModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-emerald-400/60 hover:text-emerald-300 transition-colors"
                   >
                     <FaTimes className="h-5 w-5" />
                   </button>
@@ -193,37 +196,37 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                 <form onSubmit={handleSubmit(onFormSubmit)} className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
                   {/* Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-emerald-100 mb-1">
                       Trip Title *
                     </label>
                     <input
                       {...register('title')}
                       type="text"
                       placeholder="e.g., European Summer Adventure"
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                        errors.title ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                        errors.title ? 'border-red-500/50' : 'border-emerald-500/30'
                       }`}
                     />
                     {errors.title && (
-                      <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.title.message}</p>
                     )}
                   </div>
 
                   {/* Destination */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-emerald-100 mb-1">
                       Destination *
                     </label>
                     <input
                       {...register('destination')}
                       type="text"
                       placeholder="e.g., Paris, France"
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                        errors.destination ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                        errors.destination ? 'border-red-500/50' : 'border-emerald-500/30'
                       }`}
                     />
                     {errors.destination && (
-                      <p className="mt-1 text-sm text-red-600">{errors.destination.message}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.destination.message}</p>
                     )}
                   </div>
 
@@ -231,76 +234,76 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                   <div className="grid grid-cols-2 gap-4">
                     {/* Start Date */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-emerald-100 mb-1">
                         Start Date *
                       </label>
                       <input
                         {...register('startDate')}
                         type="date"
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                          errors.startDate ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                          errors.startDate ? 'border-red-500/50' : 'border-emerald-500/30'
                         }`}
                       />
                       {errors.startDate && (
-                        <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                        <p className="mt-1 text-sm text-red-400">{errors.startDate.message}</p>
                       )}
                     </div>
 
                     {/* End Date */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-emerald-100 mb-1">
                         End Date *
                       </label>
                       <input
                         {...register('endDate')}
                         type="date"
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                          errors.endDate ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                          errors.endDate ? 'border-red-500/50' : 'border-emerald-500/30'
                         }`}
                       />
                       {errors.endDate && (
-                        <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+                        <p className="mt-1 text-sm text-red-400">{errors.endDate.message}</p>
                       )}
                     </div>
                   </div>
 
                   {/* Description */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-emerald-100 mb-1">
                       Description
                     </label>
                     <textarea
                       {...register('description')}
                       placeholder="Share details about your trip..."
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                      className="w-full px-3 py-2 border border-emerald-500/30 rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
                     />
                   </div>
 
                   {/* Cover Image with Dropzone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-emerald-100 mb-2">
                       Cover Image
                     </label>
                     <div
                       {...getRootProps()}
                       className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all min-h-[200px] active:scale-95 ${
                         isDragActive
-                          ? 'border-blue-500 bg-blue-50 scale-105'
+                          ? 'border-emerald-400 bg-emerald-500/20 scale-105'
                           : previewUrl
-                          ? 'border-gray-300'
-                          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 active:border-blue-600 active:bg-blue-100'
+                          ? 'border-emerald-500/30'
+                          : 'border-emerald-500/30 hover:border-emerald-400/50 hover:bg-emerald-500/10 active:border-emerald-400 active:bg-emerald-500/20'
                       }`}
                     >
                       <input {...getInputProps()} />
                       {!previewUrl ? (
                         <div className="space-y-2">
-                          <FaCloudUploadAlt className="h-10 w-10 text-gray-400 mx-auto" />
+                          <FaCloudUploadAlt className="h-10 w-10 text-emerald-400/60 mx-auto" />
                           <div>
-                            <p className="text-gray-600 font-medium">
+                            <p className="text-emerald-100/80 font-medium">
                               {isDragActive ? 'Drop your image here' : 'Drag & drop or click to select'}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                            <p className="text-xs text-emerald-200/50 mt-1">PNG, JPG, GIF up to 10MB</p>
                           </div>
                         </div>
                       ) : (
@@ -324,7 +327,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
 
                   {/* Locations */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-emerald-100 mb-2">
                       Trip Location (Optional)
                     </label>
                     <div className="space-y-2">
@@ -334,14 +337,14 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                           value={locationInput}
                           onChange={(e) => setLocationInput(e.target.value)}
                           placeholder="Search for a location..."
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                          className="flex-1 px-3 py-2 border border-emerald-500/30 rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
                           onKeyPress={(e) => e.key === 'Enter' && handleGetCoordinates()}
                         />
                         <button
                           type="button"
                           onClick={handleGetCoordinates}
                           disabled={isGeocodingLoading}
-                          className="px-3 py-2 sm:px-4 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 transition-all duration-75 flex items-center gap-2 font-medium min-h-[44px]"
+                          className="px-3 py-2 sm:px-4 sm:py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 disabled:opacity-50 transition-all duration-75 flex items-center gap-2 font-medium min-h-[44px]"
                         >
                           {isGeocodingLoading ? <FaSpinner className="animate-spin" /> : <FaMapPin />}
                           Add
@@ -380,19 +383,19 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                   )}
 
                   {/* Actions */}
-                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                  <div className="flex justify-end gap-3 pt-4 border-t border-emerald-500/20">
                     <button
                       type="button"
                       onClick={handleCloseModal}
                       disabled={isLoading}
-                      className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-md hover:bg-gray-100 active:bg-gray-200 active:scale-95 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
+                      className="px-4 py-3 text-sm font-medium text-emerald-100 bg-slate-700/50 border border-emerald-500/30 rounded-md hover:bg-slate-700/70 active:bg-slate-700/90 active:scale-95 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="px-4 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 active:scale-95 disabled:opacity-50 flex items-center gap-2 transition-all duration-75 min-h-[44px]"
+                      className="px-4 py-3 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 disabled:opacity-50 flex items-center gap-2 transition-all duration-75 min-h-[44px]"
                     >
                       {isLoading ? (
                         <>

@@ -31,10 +31,7 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
   };
 
   return (
-    <div className="relative w-full bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 min-h-screen">
-      <div className="absolute inset-0 z-0">
-        <AnimatedDiaryBackground />
-      </div>
+    <div className="relative w-full">
       <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         {/* Page Header */}
         <motion.div
@@ -85,8 +82,10 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="text-lg font-medium text-text mb-2">No trips yet</h3>
-            <p className="text-text/80">
+            <h3 className="text-lg font-medium text-white mb-2">
+              No trips yet
+            </h3>
+            <p className="text-white/80">
               Create your first trip to start documenting your adventures!
             </p>
           </motion.div>

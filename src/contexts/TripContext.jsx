@@ -7,14 +7,14 @@ const TripContext = createContext();
 
 export function TripProvider({ children }) {
   const [selectedTrip, setSelectedTrip] = useState(null);
-  const [trips, setTrips] = useState([]);
+  const [allTrips, setAllTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
 
   // Load trips from Firestore when user is authenticated
   useEffect(() => {
     if (!currentUser) {
-      setTrips([]);
+      setAllTrips([]);
       setLoading(false);
       return;
     }
@@ -30,24 +30,30 @@ export function TripProvider({ children }) {
         }));
         
         // When user is logged in, always use Firestore trips (empty or not)
-        setTrips(loadedTrips.length > 0 ? loadedTrips : []);
+        setAllTrips(loadedTrips.length > 0 ? loadedTrips : []);
         setLoading(false);
       }, (error) => {
         console.error('Error loading trips:', error);
-        setTrips(SAMPLE_TRIPS);
+        setAllTrips([]);
         setLoading(false);
       });
 
       return unsubscribe;
     } catch (error) {
       console.error('Error setting up trips listener:', error);
-      setTrips([]);
+      setAllTrips([]);
       setLoading(false);
     }
   }, [currentUser]);
 
+  // Get active (non-archived) trips
+  const trips = allTrips.filter(trip => !trip.isArchived);
+  
+  // Get archived trips
+  const archivedTrips = allTrips.filter(trip => trip.isArchived);
+
   const addTrip = (newTrip) => {
-    setTrips(prev => {
+    setAllTrips(prev => {
       // Remove duplicate if it exists, then add new trip
       const filtered = prev.filter(t => t.id !== newTrip.id);
       return [newTrip, ...filtered];
@@ -55,7 +61,16 @@ export function TripProvider({ children }) {
   };
 
   return (
-    <TripContext.Provider value={{ selectedTrip, setSelectedTrip, trips, setTrips, addTrip, loading }}>
+    <TripContext.Provider value={{ 
+      selectedTrip, 
+      setSelectedTrip, 
+      trips,
+      allTrips,
+      setAllTrips,
+      archivedTrips,
+      addTrip, 
+      loading 
+    }}>
       {children}
     </TripContext.Provider>
   );
