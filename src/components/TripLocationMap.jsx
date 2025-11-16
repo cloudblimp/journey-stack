@@ -52,7 +52,7 @@ export default function TripLocationMap({ locations = [] }) {
   const center = [validLocations[0].lat, validLocations[0].lng];
 
   return (
-    <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg mb-8 border border-gray-200 relative z-0">
+    <div className="w-full h-96 rounded-lg overflow-hidden shadow-2xl mb-8 border border-emerald-500/30 relative z-0">
       <MapContainer
         center={center}
         zoom={13}
@@ -71,7 +71,7 @@ export default function TripLocationMap({ locations = [] }) {
         {polylinePath.length > 1 && (
           <Polyline
             positions={polylinePath}
-            color="#1f2937"
+            color="#10b981"
             weight={3}
             opacity={0.8}
             dashArray="5, 5"
@@ -87,11 +87,11 @@ export default function TripLocationMap({ locations = [] }) {
           >
             <Popup>
               <div className="min-w-[200px]">
-                <h3 className="font-bold text-sm mb-1">{location.name}</h3>
-                <p className="text-xs text-gray-600 mb-2">
+                <h3 className="font-bold text-sm mb-1 text-slate-900">{location.name}</h3>
+                <p className="text-xs text-emerald-700 mb-2">
                   {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
                 </p>
-                <p className="text-xs text-blue-600">Stop {index + 1} of {validLocations.length}</p>
+                <p className="text-xs text-emerald-600">Stop {index + 1} of {validLocations.length}</p>
               </div>
             </Popup>
           </Marker>

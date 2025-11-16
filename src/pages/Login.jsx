@@ -74,26 +74,26 @@ export default function Login() {
 
   return (
     <motion.div 
-      className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50"
+      className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div 
-        className="w-full max-w-md p-8 bg-white rounded-lg shadow-md"
+        className="w-full max-w-md p-8 bg-slate-900/80 backdrop-blur-md rounded-xl shadow-2xl border border-emerald-500/30"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Log In</h2>
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Log In</h2>
         
         {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md mb-4">
+          <div className="p-3 bg-red-500/20 text-red-200 rounded-md mb-4 border border-red-500/30">
             {error}
           </div>
         )}  <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
+            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -101,12 +101,12 @@ export default function Login() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
               required
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="password">
+            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="password">
               Password
             </label>
             <input
@@ -114,7 +114,7 @@ export default function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
               required
             />
           </div>
@@ -122,19 +122,19 @@ export default function Login() {
             <button
               type="button"
               onClick={() => setForgotMode(prev => !prev)}
-              className="text-sm text-blue-600 hover:underline transition-colors"
+              className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
             >
               {forgotMode ? 'Back to login' : 'Forgot password?'}
             </button>
             {resetMessage && (
-              <div className="text-sm text-green-600">{resetMessage}</div>
+              <div className="text-sm text-emerald-300">{resetMessage}</div>
             )}
           </div>
           {!forgotMode ? (
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 active:bg-blue-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 transition-all duration-75 font-medium min-h-[48px]"
+              className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-[48px]"
             >
               {loading ? 'Logging In...' : 'Log In'}
             </button>
@@ -143,7 +143,7 @@ export default function Login() {
               type="button"
               onClick={handleResetPassword}
               disabled={loading}
-              className="w-full bg-yellow-600 text-white py-3 px-4 rounded-lg hover:bg-yellow-700 active:bg-yellow-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 disabled:bg-gray-400 transition-all duration-75 font-medium min-h-[48px]"
+              className="w-full bg-cyan-600 text-white py-3 px-4 rounded-lg hover:bg-cyan-700 active:bg-cyan-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-[48px]"
             >
               {loading ? 'Sending...' : 'Send reset email'}
             </button>
@@ -153,7 +153,7 @@ export default function Login() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 mt-2 border py-2 px-4 rounded-lg hover:bg-gray-100 disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 mt-2 border border-emerald-500/30 py-2 px-4 rounded-lg hover:bg-emerald-500/10 disabled:opacity-60 text-white transition-colors"
           >
             {/* Inline Google logo to avoid external asset dependency */}
             <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
@@ -166,10 +166,10 @@ export default function Login() {
           </button>
         </div>
         
-        <p className="text-center text-gray-600 text-sm mt-6">
+        <p className="text-center text-emerald-200/60 text-sm mt-6">
           Don't have an account? 
           {/* Use Link instead of <a> for internal app navigation */}
-          <Link to="/signup" className="text-blue-600 hover:underline ml-1">
+          <Link to="/signup" className="text-emerald-400 hover:text-emerald-300 ml-1 transition-colors">
             Sign Up
           </Link>
         </p>

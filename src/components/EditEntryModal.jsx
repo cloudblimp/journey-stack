@@ -98,13 +98,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
   if (!isOpen || !entry) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-2xl rounded-xl bg-slate-900/95 border-emerald-500/30 backdrop-blur-xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Edit Entry</h3>
+          <h3 className="text-lg font-semibold text-white">Edit Entry</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-emerald-400/60 hover:text-emerald-400 transition-colors"
             disabled={isLoading}
           >
             <span className="sr-only">Close</span>
@@ -117,7 +117,7 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-emerald-100">
               Title
             </label>
             <input
@@ -128,13 +128,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
               onChange={handleChange}
               placeholder="Give your entry a title..."
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-emerald-500/30 rounded-lg shadow-sm placeholder-emerald-200/40 bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors sm:text-sm"
             />
           </div>
 
           {/* Date & Time */}
           <div>
-            <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="dateTime" className="block text-sm font-medium text-emerald-100">
               Date & Time
             </label>
             <input
@@ -144,13 +144,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
               value={entryData.dateTime}
               onChange={handleChange}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-emerald-500/30 rounded-lg shadow-sm bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors sm:text-sm"
             />
           </div>
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="location" className="block text-sm font-medium text-emerald-100">
               Location
             </label>
             <input
@@ -160,13 +160,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
               value={entryData.location}
               onChange={handleChange}
               placeholder="Where are you?"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-emerald-500/30 rounded-lg shadow-sm placeholder-emerald-200/40 bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors sm:text-sm"
             />
           </div>
 
           {/* Story */}
           <div>
-            <label htmlFor="story" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="story" className="block text-sm font-medium text-emerald-100">
               Your Story
             </label>
             <textarea
@@ -176,13 +176,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
               onChange={handleChange}
               placeholder="What happened today? What did you see, feel, and experience?"
               rows={6}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-emerald-500/30 rounded-lg shadow-sm placeholder-emerald-200/40 bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors sm:text-sm"
             />
           </div>
 
           {/* Photo Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-emerald-100 mb-2">
               Photo
             </label>
             
@@ -192,13 +192,13 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
                 <img 
                   src={entryData.photoFile ? URL.createObjectURL(entryData.photoFile) : entryData.photoUrl}
                   alt="Preview"
-                  className="w-full h-48 object-cover rounded-md"
+                  className="w-full h-48 object-cover rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
                   disabled={isLoading || uploadingPhoto}
-                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 disabled:opacity-50"
+                  className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 disabled:opacity-50 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -208,7 +208,7 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
             )}
 
             {/* Upload Input */}
-            <label className="flex items-center justify-center w-full px-4 py-6 text-sm font-medium text-gray-600 bg-gray-50 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 disabled:opacity-50">
+            <label className="flex items-center justify-center w-full px-4 py-6 text-sm font-medium text-emerald-200 bg-slate-800/50 border-2 border-dashed border-emerald-500/30 rounded-lg cursor-pointer hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all disabled:opacity-50">
               <input
                 type="file"
                 accept="image/*"
@@ -217,10 +217,10 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
                 className="hidden"
               />
               <div className="flex flex-col items-center">
-                <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-emerald-400/50 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                <span className="text-xs text-center">
+                <span className="text-xs text-center text-emerald-200/70">
                   {uploadingPhoto ? 'Uploading...' : 'Click to upload or replace photo'}
                 </span>
               </div>
@@ -229,25 +229,25 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
 
           {/* Error */}
           {error && (
-            <div className="rounded-md bg-red-50 p-3">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="rounded-lg bg-red-500/20 p-3 border border-red-500/30">
+              <p className="text-sm text-red-200">{error}</p>
             </div>
           )}
 
           {/* Buttons */}
-          <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-emerald-500/20">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 active:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
+              className="px-4 py-3 text-sm font-medium text-emerald-200 bg-slate-800/50 border border-emerald-500/30 rounded-lg hover:bg-slate-800 hover:border-emerald-500/50 active:bg-slate-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 transition-all duration-75 min-h-[44px]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || uploadingPhoto}
-              className="px-4 py-3 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 active:bg-gray-950 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 flex items-center transition-all duration-75 min-h-[44px]"
+              className="px-4 py-3 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 flex items-center transition-all duration-75 min-h-[44px]"
             >
               {isLoading || uploadingPhoto ? (
                 <>

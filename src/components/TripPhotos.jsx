@@ -84,13 +84,13 @@ export default function TripPhotos({ tripId, photos = [] }) {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
+    <div className="bg-slate-800/50 rounded-lg border border-emerald-500/30 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Trip Photos ({photos.length})</h3>
+        <h3 className="text-lg font-semibold text-white">Trip Photos ({photos.length})</h3>
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="inline-flex items-center px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 disabled:opacity-50 transition-colors text-sm font-medium"
+          className="inline-flex items-center px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors text-sm font-medium"
         >
           <FaUpload className="mr-2 h-4 w-4" />
           {isUploading ? 'Uploading...' : 'Upload'}
@@ -107,12 +107,12 @@ export default function TripPhotos({ tripId, photos = [] }) {
       </div>
 
       {photos.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-emerald-200/60">
           <p className="mb-4">No photos yet</p>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="text-emerald-400 hover:text-emerald-300 font-medium"
           >
             Upload your first photo
           </button>
@@ -122,12 +122,12 @@ export default function TripPhotos({ tripId, photos = [] }) {
           {photos.map((photo, index) => (
             <div
               key={photo.id}
-              className="relative group rounded-lg overflow-hidden bg-gray-100 cursor-pointer"
+              className="relative group rounded-lg overflow-hidden bg-slate-700/50 cursor-pointer border border-emerald-500/20 hover:border-emerald-500/50 transition-colors"
               onClick={() => setSelectedPhotoIndex(index)}
             >
               {imageErrors[photo.id] ? (
-                <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">Image unavailable</span>
+                <div className="w-full h-32 bg-slate-700 flex items-center justify-center">
+                  <span className="text-emerald-200/60 text-sm">Image unavailable</span>
                 </div>
               ) : (
                 <img
@@ -155,13 +155,13 @@ export default function TripPhotos({ tripId, photos = [] }) {
       {/* Lightbox Modal */}
       {selectedPhotoIndex !== null && photos.length > 0 && (
         <div
-          className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-between p-4"
+          className="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-50 flex flex-col items-center justify-between p-4"
           onClick={handleCloseModal}
         >
           {/* Close Button */}
           <button
             onClick={handleCloseModal}
-            className="self-end p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-colors"
+            className="self-end p-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 rounded-full transition-colors"
           >
             <FaTimes className="h-6 w-6" />
           </button>
@@ -172,7 +172,7 @@ export default function TripPhotos({ tripId, photos = [] }) {
             onClick={(e) => e.stopPropagation()}
           >
             {imageErrors[photos[selectedPhotoIndex]?.id] ? (
-              <div className="text-gray-400 text-lg">Image unavailable</div>
+              <div className="text-emerald-200/60 text-lg">Image unavailable</div>
             ) : (
               <img
                 src={photos[selectedPhotoIndex].photoUrl}
@@ -188,19 +188,19 @@ export default function TripPhotos({ tripId, photos = [] }) {
             <button
               onClick={handlePrevPhoto}
               disabled={selectedPhotoIndex === 0}
-              className="p-3 bg-white/20 hover:bg-white/40 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-3 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <FaChevronLeft className="h-6 w-6" />
             </button>
 
-            <span className="text-white font-medium text-lg min-w-fit">
+            <span className="text-emerald-100 font-medium text-lg min-w-fit">
               {selectedPhotoIndex + 1} / {photos.length}
             </span>
 
             <button
               onClick={handleNextPhoto}
               disabled={selectedPhotoIndex === photos.length - 1}
-              className="p-3 bg-white/20 hover:bg-white/40 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-3 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <FaChevronRight className="h-6 w-6" />
             </button>

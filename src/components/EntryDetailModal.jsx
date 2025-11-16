@@ -4,12 +4,12 @@ export default function EntryDetailModal({ isOpen, onClose, entry, onDelete, onE
   if (!isOpen || !entry) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+      <div className="relative mx-auto p-6 border w-full max-w-2xl shadow-2xl rounded-xl bg-slate-900/95 border-emerald-500/30 backdrop-blur-xl">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+          className="absolute top-4 right-4 text-emerald-400/60 hover:text-emerald-400 transition-colors"
         >
           <span className="sr-only">Close</span>
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,10 +20,10 @@ export default function EntryDetailModal({ isOpen, onClose, entry, onDelete, onE
         {/* Content */}
         <div className="space-y-4">
           {/* Title */}
-          <h2 className="text-2xl font-bold text-gray-900">{entry.title}</h2>
+          <h2 className="text-2xl font-bold text-white">{entry.title}</h2>
 
           {/* Date & Time */}
-          <div className="flex items-center text-gray-600">
+          <div className="flex items-center text-emerald-200/70">
             <span className="inline-block mr-2">📅</span>
             {new Date(entry.dateTime).toLocaleString('en-US', {
               weekday: 'long',
@@ -37,7 +37,7 @@ export default function EntryDetailModal({ isOpen, onClose, entry, onDelete, onE
 
           {/* Location */}
           {entry.location && (
-            <div className="flex items-center text-gray-600">
+            <div className="flex items-center text-emerald-200/70">
               <span className="inline-block mr-2">📍</span>
               {entry.location}
             </div>
@@ -49,30 +49,30 @@ export default function EntryDetailModal({ isOpen, onClose, entry, onDelete, onE
               <img
                 src={entry.photoUrl}
                 alt={entry.title}
-                className="w-full h-96 object-cover rounded-lg"
+                className="w-full h-96 object-cover rounded-lg border border-emerald-500/30"
               />
             </div>
           )}
 
           {/* Story */}
           <div className="mt-6">
-            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+            <p className="text-emerald-100 whitespace-pre-wrap leading-relaxed">
               {entry.story}
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 justify-end mt-8 pt-6 border-t border-gray-200">
+          <div className="flex gap-3 justify-end mt-8 pt-6 border-t border-emerald-500/20">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+              className="px-4 py-2 text-sm font-medium text-emerald-200 bg-slate-800/50 border border-emerald-500/30 rounded-lg hover:bg-slate-800 hover:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
             >
               Close
             </button>
 
             <button
               onClick={() => onEdit(entry)}
-              className="px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 flex items-center"
+              className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 active:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors flex items-center"
             >
               <span className="mr-2">✏️</span> Edit
             </button>
@@ -80,7 +80,7 @@ export default function EntryDetailModal({ isOpen, onClose, entry, onDelete, onE
             <button
               onClick={() => onDelete(entry.id)}
               disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors disabled:opacity-50 flex items-center"
             >
               {isDeleting ? (
                 <>

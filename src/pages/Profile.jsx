@@ -118,7 +118,7 @@ export default function Profile() {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -132,18 +132,18 @@ export default function Profile() {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 active:text-blue-800 active:scale-95 mb-8 transition-all duration-75 px-2 py-2 rounded hover:bg-blue-50 active:bg-blue-100"
+          className="flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 active:text-emerald-200 active:scale-95 mb-8 transition-all duration-75 px-2 py-2 rounded hover:bg-emerald-500/10 active:bg-emerald-500/20"
         >
           <FaArrowLeft className="h-4 w-4" />
           <span>Back</span>
         </button>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">My Profile</h1>
+        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-emerald-500/30">
+          <h1 className="text-3xl font-bold text-white mb-8">My Profile</h1>
 
           {/* Profile Picture Section */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-4">
+            <label className="block text-sm font-medium text-emerald-100 mb-4">
               Profile Picture
             </label>
             <div className="flex items-center space-x-8">
@@ -153,10 +153,10 @@ export default function Profile() {
                   <img
                     src={profileImagePreview}
                     alt="Profile"
-                    className="h-24 w-24 rounded-full object-cover"
+                    className="h-24 w-24 rounded-full object-cover border-2 border-emerald-500"
                   />
                 ) : (
-                  <div className="h-24 w-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold">
+                  <div className="h-24 w-24 rounded-full bg-emerald-600 text-white flex items-center justify-center text-3xl font-bold">
                     {userInitial}
                   </div>
                 )}
@@ -164,8 +164,8 @@ export default function Profile() {
 
               {/* Upload Button */}
               <div className="flex-1">
-                <label className="flex items-center justify-center px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                  <div className="flex items-center space-x-2 text-gray-600">
+                <label className="flex items-center justify-center px-6 py-3 border-2 border-dashed border-emerald-500/40 rounded-lg cursor-pointer hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all">
+                  <div className="flex items-center space-x-2 text-emerald-200">
                     <FaCamera className="h-5 w-5" />
                     <span>Upload Picture</span>
                   </div>
@@ -176,14 +176,14 @@ export default function Profile() {
                     className="hidden"
                   />
                 </label>
-                <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF (max 5MB)</p>
+                <p className="text-xs text-emerald-200/60 mt-2">JPG, PNG or GIF (max 5MB)</p>
               </div>
             </div>
           </div>
 
           {/* Display Name Section */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-emerald-100 mb-2">
               Display Name
             </label>
             <input
@@ -191,21 +191,21 @@ export default function Profile() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Enter your display name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
           {/* Travel Stats Section */}
-          <div className="grid grid-cols-2 gap-4 mb-8 bg-gray-50 p-6 rounded-lg">
+          <div className="grid grid-cols-2 gap-4 mb-8 bg-slate-800/50 p-6 rounded-lg border border-emerald-500/20">
             <div>
-              <p className="text-gray-600 text-sm">Total Trips</p>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-emerald-200/60 text-sm">Total Trips</p>
+              <p className="text-3xl font-bold text-emerald-400">
                 {loading ? <FaSpinner className="animate-spin" /> : stats.trips}
               </p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Total Entries</p>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-emerald-200/60 text-sm">Total Entries</p>
+              <p className="text-3xl font-bold text-emerald-400">
                 {loading ? <FaSpinner className="animate-spin" /> : stats.entries}
               </p>
             </div>
@@ -213,21 +213,21 @@ export default function Profile() {
 
           {/* Email Display (Read-only) */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-emerald-100 mb-2">
               Email Address
             </label>
             <input
               type="email"
               value={currentUser.email}
               disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+              className="w-full px-4 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-emerald-200/60"
             />
-            <p className="text-xs text-gray-500 mt-2">To change your email, go to Account Settings</p>
+            <p className="text-xs text-emerald-200/40 mt-2">To change your email, go to Account Settings</p>
           </div>
 
           {/* Message */}
           {message && (
-            <div className={`mb-6 p-4 rounded-lg ${message.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+            <div className={`mb-6 p-4 rounded-lg ${message.includes('Error') ? 'bg-red-500/20 text-red-200 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'}`}>
               {message}
             </div>
           )}
@@ -236,7 +236,7 @@ export default function Profile() {
           <button
             onClick={handleSaveProfile}
             disabled={saving}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+            className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 font-medium transition-colors"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

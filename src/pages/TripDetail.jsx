@@ -248,7 +248,7 @@ export default function TripDetail() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-900">
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden">
         {trip.coverImage ? (
@@ -256,30 +256,29 @@ export default function TripDetail() {
         ) : (
           <TripDetailHeroPlaceholder />
         )}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/70 to-slate-900/40" />
 
         {/* Back button - top left */}
         <div className="absolute top-4 left-4 z-20">
-          <Link to="/" className="inline-flex items-center px-4 py-2 bg-white/100 hover:bg-white/30 rounded text-sm">
+          <Link to="/" className="inline-flex items-center px-4 py-2 bg-emerald-600/90 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white transition-colors shadow-lg">
             <FaArrowLeft className="mr-2" /> Back to Trips
           </Link>
         </div>
 
         {/* View Itinerary button - top right */}
-                {/* View Itinerary button - top right */}
         <div className="absolute top-4 right-4 z-20">
           <button 
             onClick={() => setIsItineraryModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-100 rounded-lg text-sm font-medium text-text transition-colors shadow-md"
+            className="inline-flex items-center px-4 py-2 bg-emerald-600/90 hover:bg-emerald-700 rounded-lg text-sm font-medium text-white transition-colors shadow-lg"
           >
             <FaCalendarAlt className="mr-2" /> View Itinerary
           </button>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-          <h1 className="text-3xl font-bold">{trip.title}</h1>
-          <p className="mt-1 text-white/90 max-w-3xl">{trip.description}</p>
-          <div className="mt-2 flex items-center text-white/90">
+          <h1 className="text-3xl font-bold text-white">{trip.title}</h1>
+          <p className="mt-1 text-emerald-100/90 max-w-3xl">{trip.description}</p>
+          <div className="mt-2 flex items-center text-emerald-100/90">
             <FaCalendarAlt className="mr-2" />
             {formatDate(trip.startDate)}{trip.endDate ? ` - ${formatDate(trip.endDate)}` : ''}
           </div>
@@ -291,7 +290,7 @@ export default function TripDetail() {
         {/* Trip Location Map - Full Width */}
         {trip.locations && trip.locations.length > 0 && (
           <div className="mb-12 relative z-0">
-            <h2 className="text-xl font-semibold mb-4">Trip Stops</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">Trip Stops</h2>
             <TripLocationMap locations={trip.locations} />
           </div>
         )}
@@ -300,10 +299,10 @@ export default function TripDetail() {
           {/* Journal Entries - Left Side (2 columns) */}
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Journal Entries ({entries.length})</h2>
+              <h2 className="text-xl font-semibold text-white">Journal Entries ({entries.length})</h2>
               <button 
                 onClick={handleNewEntry}
-                className="inline-flex items-center px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800"
+                className="inline-flex items-center px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 active:bg-emerald-800 transition-colors"
               >
                 <FaPlus className="mr-2 h-4 w-4" /> New Entry
               </button>
@@ -311,12 +310,12 @@ export default function TripDetail() {
             {entriesLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[...Array(2)].map((_, i) => (
-                  <div key={`skeleton-${i}`} className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md animate-pulse">
-                    <div className="w-full h-48 bg-gray-300" />
+                  <div key={`skeleton-${i}`} className="rounded-lg border border-emerald-500/30 bg-slate-800/50 overflow-hidden shadow-md animate-pulse">
+                    <div className="w-full h-48 bg-slate-700/50" />
                     <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-3 bg-gray-200 rounded w-1/2" />
-                      <div className="h-3 bg-gray-200 rounded w-full" />
+                      <div className="h-4 bg-slate-700 rounded w-3/4" />
+                      <div className="h-3 bg-slate-700 rounded w-1/2" />
+                      <div className="h-3 bg-slate-700 rounded w-full" />
                     </div>
                   </div>
                 ))}
@@ -329,7 +328,7 @@ export default function TripDetail() {
                 animate="visible"
               >
                 {entries.length === 0 ? (
-                  <motion.div variants={itemVariants} className="rounded-lg border border-white/20 bg-white p-4 text-text/70">
+                  <motion.div variants={itemVariants} className="rounded-lg border border-emerald-500/30 bg-slate-800/50 p-4 text-emerald-200/60">
                     No entries yet. Create your first one!
                   </motion.div>
                 ) : (
@@ -339,20 +338,20 @@ export default function TripDetail() {
                       variants={itemVariants}
                       onClick={() => handleEntryCardClick(entry)}
                       whileHover={{ y: -4 }}
-                      className="rounded-lg border border-white/20 bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                      className="rounded-lg border border-emerald-500/30 bg-slate-800/50 overflow-hidden shadow-md hover:shadow-lg hover:border-emerald-500/50 transition-all cursor-pointer"
                     >
                       {entry.photoUrl && (
                         <img src={entry.photoUrl} alt={entry.title} className="w-full h-48 object-cover" />
                       )}
                       <div className="p-4">
-                        <h3 className="font-semibold text-text mb-1">{entry.title}</h3>
+                        <h3 className="font-semibold text-white mb-1">{entry.title}</h3>
                         {entry.location && (
-                          <p className="text-sm text-text/80 mb-2">📍 {entry.location}</p>
+                          <p className="text-sm text-emerald-200/80 mb-2">📍 {entry.location}</p>
                         )}
-                        <p className="text-sm text-text/70 mb-3">
+                        <p className="text-sm text-emerald-200/60 mb-3">
                           {new Date(entry.dateTime).toLocaleString()}
                         </p>
-                        <p className="text-sm text-text line-clamp-3">{entry.story}</p>
+                        <p className="text-sm text-emerald-100 line-clamp-3">{entry.story}</p>
                       </div>
                     </motion.div>
                   ))
