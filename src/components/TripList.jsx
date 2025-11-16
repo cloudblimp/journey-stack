@@ -82,8 +82,10 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="text-lg font-medium text-text mb-2">No trips yet</h3>
-            <p className="text-text/80">
+            <h3 className="text-lg font-medium text-white mb-2">
+              No trips yet
+            </h3>
+            <p className="text-white/80">
               Create your first trip to start documenting your adventures!
             </p>
           </motion.div>
