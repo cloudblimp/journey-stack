@@ -91,46 +91,44 @@ export default function Login() {
           <div className="p-3 bg-red-500/20 text-red-200 rounded-md mb-4 border border-red-500/30">
             {error}
           </div>
-        )}  <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
-              required
-            />
-          </div>
-          <div className="flex items-center justify-between mb-4">
+        )}
+        
+        {!forgotMode ? (
+          // Normal Login Mode
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                required
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="password">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                required
+              />
+            </div>
             <button
               type="button"
-              onClick={() => setForgotMode(prev => !prev)}
-              className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+              onClick={() => setForgotMode(true)}
+              className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors mb-4 block"
             >
-              {forgotMode ? 'Back to login' : 'Forgot password?'}
+              Forgot password?
             </button>
-            {resetMessage && (
-              <div className="text-sm text-emerald-300">{resetMessage}</div>
-            )}
-          </div>
-          {!forgotMode ? (
             <button
               type="submit"
               disabled={loading}
@@ -138,17 +136,45 @@ export default function Login() {
             >
               {loading ? 'Logging In...' : 'Log In'}
             </button>
-          ) : (
+          </form>
+        ) : (
+          // Forgot Password Mode
+          <form onSubmit={(e) => { e.preventDefault(); handleResetPassword(); }}>
+            <div className="mb-4">
+              <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                required
+              />
+            </div>
+            {resetMessage && (
+              <div className="text-sm text-emerald-300 mb-4 p-3 bg-emerald-500/20 rounded-lg border border-emerald-500/30">
+                {resetMessage}
+              </div>
+            )}
             <button
-              type="button"
-              onClick={handleResetPassword}
+              type="submit"
               disabled={loading}
-              className="w-full bg-cyan-600 text-white py-3 px-4 rounded-lg hover:bg-cyan-700 active:bg-cyan-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-[48px]"
+              className="w-full bg-cyan-600 text-white py-3 px-4 rounded-lg hover:bg-cyan-700 active:bg-cyan-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-[48px] mb-3"
             >
               {loading ? 'Sending...' : 'Send reset email'}
             </button>
-          )}
-        </form>
+            <button
+              type="button"
+              onClick={() => setForgotMode(false)}
+              className="w-full text-emerald-400 hover:text-emerald-300 transition-colors py-2 text-sm border border-emerald-500/30 rounded-lg hover:bg-emerald-500/5"
+            >
+              Back to login
+            </button>
+          </form>
+        )}
+        
         <div className="mt-4">
           <button
             onClick={handleGoogleSignIn}

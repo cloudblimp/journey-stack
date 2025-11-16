@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { getCurrentISTDateTime } from '../utils/dateUtils';
 
 export default function AddActivityModal({ isOpen, onClose, tripId, selectedDate, onAddActivity }) {
@@ -60,12 +61,12 @@ export default function AddActivityModal({ isOpen, onClose, tripId, selectedDate
     e.preventDefault();
     
     if (!activityData.title) {
-      alert('Please enter activity title');
+      toast.error('Please enter activity title');
       return;
     }
 
     if (!activityData.date) {
-      alert('Please select a date');
+      toast.error('Please select a date');
       return;
     }
 
@@ -81,11 +82,12 @@ export default function AddActivityModal({ isOpen, onClose, tripId, selectedDate
         description: activityData.description || ''
       });
       
+      toast.success('Activity added successfully! ✨');
       resetForm();
       onClose();
     } catch (error) {
       console.error('Error adding activity:', error);
-      alert('Failed to add activity: ' + error.message);
+      toast.error('Failed to add activity: ' + error.message);
     }
   };
 

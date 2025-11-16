@@ -98,9 +98,9 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
   if (!isOpen || !entry) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-2xl rounded-xl bg-slate-900/95 border-emerald-500/30 backdrop-blur-xl">
-        <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-start justify-center p-4 sm:items-center overflow-hidden">
+      <div className="w-full max-w-2xl my-4 sm:my-auto max-h-[calc(100vh-2rem)] flex flex-col border shadow-2xl rounded-xl bg-slate-900/95 border-emerald-500/30 backdrop-blur-xl">
+        <div className="flex justify-between items-center mb-4 p-6 border-b border-emerald-500/20 flex-shrink-0">
           <h3 className="text-lg font-semibold text-white">Edit Entry</h3>
           <button
             onClick={onClose}
@@ -114,7 +114,7 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto flex-1 px-6 py-4">
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-emerald-100">
@@ -263,6 +263,10 @@ export default function EditEntryModal({ isOpen, onClose, entry, onSave, isLoadi
             </button>
           </div>
         </form>
+
+        <div className="border-t border-emerald-500/20 p-6 flex-shrink-0">
+          {/* Actions after form close */}
+        </div>
       </div>
     </div>
   );

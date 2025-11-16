@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 export default function Dashboard() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const { setSelectedTrip, trips, addTrip } = useTrip();
+  const { setSelectedTrip, trips, addTrip, loading: tripsLoading } = useTrip();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { createTrip, loading, error } = useTrips();
 
@@ -51,7 +51,7 @@ export default function Dashboard() {
       
       {/* Content layer - scrollable */}
       <div className={`relative z-10 w-full flex-1 overflow-y-auto ${isModalOpen ? 'pointer-events-none' : ''}`}>
-        <TripList trips={trips} onCreateTrip={handleCreateTrip} onTripSelect={handleTripSelect} />
+        <TripList trips={trips} isLoading={tripsLoading} onCreateTrip={handleCreateTrip} onTripSelect={handleTripSelect} />
       </div>
       
       {/* Modal layer - fixed positioning, always interactive */}

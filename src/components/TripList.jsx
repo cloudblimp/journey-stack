@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa";
 import TripCard from "./TripCard";
 import AnimatedDiaryBackground from "./AnimatedDiaryBackground";
 
-export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
+export default function TripList({ trips = [], isLoading = false, onCreateTrip, onTripSelect }) {
   // Container animation
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -32,6 +32,23 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
 
   return (
     <div className="relative w-full">
+      {/* Loading Spinner */}
+      {isLoading && (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin inline-block">
+              <svg className="w-12 h-12 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <p className="mt-4 text-emerald-200 text-lg">Loading your trips...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Content - Only show when not loading */}
+      {!isLoading && (
       <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         {/* Page Header */}
         <motion.div
@@ -91,6 +108,7 @@ export default function TripList({ trips = [], onCreateTrip, onTripSelect }) {
           </motion.div>
         )}
       </div>
+      )}
     </div>
   );
 }

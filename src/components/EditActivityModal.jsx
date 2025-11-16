@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { useActivities } from '../hooks/useActivities';
 
 export default function EditActivityModal({ isOpen, onClose, activity, onActivityUpdated }) {
@@ -11,6 +12,7 @@ export default function EditActivityModal({ isOpen, onClose, activity, onActivit
     location: '',
     description: ''
   });
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { updateActivity, deleteActivity } = useActivities();
 
@@ -61,12 +63,12 @@ export default function EditActivityModal({ isOpen, onClose, activity, onActivit
     e.preventDefault();
 
     if (!activityData.title) {
-      alert('Please enter activity title');
+      toast.error('Please enter activity title');
       return;
     }
 
     if (!activityData.date) {
-      alert('Please select a date');
+      toast.error('Please select a date');
       return;
     }
 
@@ -81,27 +83,28 @@ export default function EditActivityModal({ isOpen, onClose, activity, onActivit
         description: activityData.description
       });
 
+      toast.success('Activity updated successfully! ✨');
       console.log('Activity updated successfully');
       onActivityUpdated?.();
       onClose();
     } catch (error) {
       console.error('Error updating activity:', error);
-      alert('Failed to update activity: ' + error.message);
+      toast.error('Failed to update activity: ' + error.message);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this activity?')) {
-      try {
-        await deleteActivity(activity.id);
-        console.log('Activity deleted successfully');
-        onActivityUpdated?.();
-        onClose();
-      } catch (error) {
-        console.error('Error deleting activity:', error);
-        alert('Failed to delete activity: ' + error.message);
-      }
+    try {
+      await deleteActivity(activity.id);
+      toast.success('Activity deleted successfully! 🗑️');
+      console.log('Activity deleted successfully');
+      onActivityUpdated?.();
+      onClose();
+    } catch (error) {
+      console.error('Error deleting activity:', error);
+      toast.error('Failed to delete activity: ' + error.message);
     }
+    setIsDeleteConfirmOpen(false);
   };
 
   if (!isOpen || !activity) return null;
@@ -239,7 +242,7 @@ export default function EditActivityModal({ isOpen, onClose, activity, onActivit
           <div className="flex gap-3 justify-between pt-4">
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setIsDeleteConfirmOpen(true)}
               className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all font-medium"
             >
               Delete
@@ -262,6 +265,33 @@ export default function EditActivityModal({ isOpen, onClose, activity, onActivit
           </div>
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900/95 rounded-xl max-w-sm w-full shadow-2xl border border-emerald-500/30 backdrop-blur-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-2">Delete Activity?</h3>
+            <p className="text-emerald-200/70 mb-6">
+              Are you sure you want to delete "<span className="font-semibold text-emerald-100">{activityData.title}</span>"? This action cannot be undone.
+            </p>
+            
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className="px-6 py-2 text-emerald-200 bg-slate-800/50 border border-emerald-500/30 rounded-lg hover:bg-slate-800 hover:border-emerald-500/50 transition-all font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all font-medium"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
