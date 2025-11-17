@@ -153,11 +153,11 @@ export default function SplashScreen({ onComplete }) {
         >
           {/* Logo/Title */}
           <motion.div variants={itemVariants} className="splash-logo">
-            <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-4">
               <motion.img 
                 src="/journeyStack-logo-t.svg"
                 alt="JourneyStack Logo"
-                className="h-12 w-12"
+                className="h-12 w-12 md:h-12 md:w-12 sm:h-6 sm:w-6"
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
@@ -166,17 +166,17 @@ export default function SplashScreen({ onComplete }) {
                 text="journeyStack"
                 speed={40}
                 delay={800}
-                className="text-6xl font-semibold text-white tracking-wider"
+                className="text-4xl md:text-4xl sm:text-1xl font-semibold text-white tracking-wider"
               />
             </div>
-            <h1 className="text-7xl font-black text-white drop-shadow-lg leading-tight">
+            <h1 className="text-7xl md:text-7xl sm:text-4xl font-black text-white drop-shadow-lg leading-tight">
               Capture Every<br />Journey
             </h1>
           </motion.div>
 
           {/* Tagline */}
           <motion.div variants={itemVariants} className="splash-tagline">
-            <p className="text-lg text-gray-100 drop-shadow-md max-w-2xl">
+            <p className="text-lg md:text-lg sm:text-xs text-gray-100 drop-shadow-md max-w-2xl">
               Your digital travel companion for documenting adventures, memories, and discoveries around the world
             </p>
           </motion.div>
@@ -185,7 +185,7 @@ export default function SplashScreen({ onComplete }) {
           <motion.div variants={itemVariants} className="splash-cta">
             <button
               onClick={handleExplore}
-              className="px-8 py-3 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 border border-white/30 flex items-center gap-2"
+              className="px-8 md:px-8 sm:px-4 py-3 md:py-3 sm:py-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white font-semibold md:text-base sm:text-xs rounded-full transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 border border-white/30 flex items-center gap-2"
             >
               Start Your Journey
               <span>→</span>
@@ -196,21 +196,21 @@ export default function SplashScreen({ onComplete }) {
           <motion.div variants={itemVariants} className="splash-features">
             <div className="features-grid">
               <div className="feature-card">
-                <span className="text-3xl mb-2">⭐</span>
-                <h3 className="font-semibold text-white mb-1">Smart Organization</h3>
-                <p className="text-sm text-gray-200">Organize by location, date, and tags</p>
+                <span className="text-3xl md:text-3xl sm:text-lg mb-2">⭐</span>
+                <h3 className="font-semibold text-white md:text-base sm:text-xs mb-1">Smart Organization</h3>
+                <p className="text-sm md:text-sm sm:text-xs text-gray-200">Organize by location, date, and tags</p>
               </div>
               <div className="feature-card">
-                <span className="text-3xl mb-2">📍</span>
-                <h3 className="font-semibold text-white mb-1">Interactive Maps</h3>
-                <p className="text-sm text-gray-200">Visualize adventures on maps</p>
+                <span className="text-3xl md:text-3xl sm:text-lg mb-2">📍</span>
+                <h3 className="font-semibold text-white md:text-base sm:text-xs mb-1">Interactive Maps</h3>
+                <p className="text-sm md:text-sm sm:text-xs text-gray-200">Visualize adventures on maps</p>
               </div>
             </div>
           </motion.div>
 
           {/* Footer Text */}
           <motion.div variants={itemVariants} className="splash-footer">
-            <p className="text-sm text-gray-300 drop-shadow-md">
+            <p className="text-sm md:text-sm sm:text-xs text-gray-300 drop-shadow-md">
               Ready to start documenting your adventures?
             </p>
           </motion.div>

@@ -54,28 +54,28 @@ export default function Signup() {
 
   return (
     <motion.div 
-      className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900"
+      className="flex items-center justify-center min-h-screen w-full px-4 py-8 md:min-h-[calc(100vh-64px)] md:px-8 bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div 
-        className="w-full max-w-md p-8 bg-slate-900/80 backdrop-blur-md rounded-xl shadow-2xl border border-emerald-500/30"
+        className="w-full max-w-sm p-4 sm:p-6 md:p-8 md:max-w-md bg-slate-900/80 backdrop-blur-md rounded-xl shadow-2xl border border-emerald-500/30"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <h2 className="text-3xl font-bold text-center text-white mb-6">Sign Up</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-white mb-4 sm:mb-6">Sign Up</h2>
 
         {error && (
-          <div className="p-3 bg-red-500/20 text-red-200 rounded-md mb-4 border border-red-500/30">
+          <div className="p-2 sm:p-3 text-xs sm:text-sm bg-red-500/20 text-red-200 rounded-md mb-3 sm:mb-4 border border-red-500/30">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="email">
+          <div className="mb-3 sm:mb-4">
+            <label className="block text-emerald-100 text-xs sm:text-sm font-semibold mb-1 sm:mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -83,12 +83,12 @@ export default function Signup() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+              className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="password">
+          <div className="mb-3 sm:mb-4">
+            <label className="block text-emerald-100 text-xs sm:text-sm font-semibold mb-1 sm:mb-2" htmlFor="password">
               Password (6+ characters)
             </label>
             <input
@@ -96,12 +96,12 @@ export default function Signup() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+              className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
               required
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-emerald-100 text-sm font-semibold mb-2" htmlFor="confirm-password">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-emerald-100 text-xs sm:text-sm font-semibold mb-1 sm:mb-2" htmlFor="confirm-password">
               Confirm Password
             </label>
             <input
@@ -109,24 +109,24 @@ export default function Signup() {
               id="confirm-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+              className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-emerald-500/30 rounded-lg bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
               required
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-[48px]"
+            className="w-full bg-emerald-600 text-white py-2 sm:py-3 px-3 sm:px-4 text-sm sm:text-base rounded-lg hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:bg-slate-600 transition-all duration-75 font-medium min-h-11 sm:min-h-12"
           >
             {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 
-        <div className="mt-4">
+        <div className="mt-4 sm:mt-6">
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 mt-2 border border-emerald-500/30 py-3 px-4 rounded-lg hover:bg-emerald-500/10 active:bg-emerald-500/20 active:scale-95 disabled:opacity-60 transition-all duration-75 font-medium min-h-[48px] text-white"
+            className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-3 sm:px-4 text-sm sm:text-base border border-emerald-500/30 rounded-lg hover:bg-emerald-500/10 active:bg-emerald-500/20 active:scale-95 disabled:opacity-60 transition-all duration-75 font-medium min-h-11 sm:min-h-12 text-white"
           >
             {/* Inline Google logo to avoid external asset dependency */}
             <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
@@ -139,7 +139,7 @@ export default function Signup() {
           </button>
         </div>
 
-        <p className="text-center text-emerald-200/60 text-sm mt-6">
+        <p className="text-center text-emerald-200/60 text-xs sm:text-sm mt-4 sm:mt-6">
           Already have an account?
           <Link to="/login" className="text-emerald-400 hover:text-emerald-300 ml-1 transition-colors">
             Log In

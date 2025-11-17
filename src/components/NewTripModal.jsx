@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -34,6 +34,9 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
   const [locations, setLocations] = useState([]);
   const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
   const [geocodingError, setGeocodingError] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const debounceTimerRef = useRef(null);
 
   const {
     register,
@@ -85,6 +88,56 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
     setLocations([]);
     setGeocodingError(null);
     setIsDragActive(false);
+    setSuggestions([]);
+  };
+
+  // Debounced location search for suggestions
+  const handleLocationInputChange = (value) => {
+    setLocationInput(value);
+    
+    // Clear previous timeout
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Clear suggestions if input is empty
+    if (!value.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    // Set new timeout for debounced search (1 second)
+    debounceTimerRef.current = setTimeout(async () => {
+      setIsLoadingSuggestions(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5`
+        );
+        const data = await response.json();
+        setSuggestions(data || []);
+      } catch (err) {
+        console.error('Error fetching suggestions:', err);
+        setSuggestions([]);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    }, 1000);
+  };
+
+  // Handle suggestion selection
+  const handleSuggestionSelect = async (suggestion) => {
+    const { lat, lon, display_name } = suggestion;
+    const newLocation = {
+      id: Date.now(),
+      name: display_name,
+      lat: parseFloat(lat),
+      lng: parseFloat(lon)
+    };
+
+    setLocations([...locations, newLocation]);
+    setLocationInput('');
+    setSuggestions([]);
+    toast.success(`Location "${display_name.split(',')[0]}" added`);
   };
 
   const handleGetCoordinates = async () => {
@@ -103,17 +156,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
       const data = await response.json();
 
       if (data && data.length > 0) {
-        const { lat, lon, display_name } = data[0];
-        const newLocation = {
-          id: Date.now(),
-          name: display_name,
-          lat: parseFloat(lat),
-          lng: parseFloat(lon)
-        };
-
-        setLocations([...locations, newLocation]);
-        setLocationInput('');
-        toast.success(`Location "${display_name.split(',')[0]}" added`);
+        await handleSuggestionSelect(data[0]);
       } else {
         setGeocodingError('Location not found. Please try a different search.');
         toast.error('Location not found');
@@ -231,38 +274,38 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                   </div>
 
                   {/* Dates Row */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {/* Start Date */}
                     <div>
-                      <label className="block text-sm font-medium text-emerald-100 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-emerald-100 mb-1">
                         Start Date *
                       </label>
                       <input
                         {...register('startDate')}
                         type="date"
-                        className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                        className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
                           errors.startDate ? 'border-red-500/50' : 'border-emerald-500/30'
                         }`}
                       />
                       {errors.startDate && (
-                        <p className="mt-1 text-sm text-red-400">{errors.startDate.message}</p>
+                        <p className="mt-1 text-xs sm:text-sm text-red-400">{errors.startDate.message}</p>
                       )}
                     </div>
 
                     {/* End Date */}
                     <div>
-                      <label className="block text-sm font-medium text-emerald-100 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-emerald-100 mb-1">
                         End Date *
                       </label>
                       <input
                         {...register('endDate')}
                         type="date"
-                        className={`w-full px-3 py-2 border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
+                        className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-md bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
                           errors.endDate ? 'border-red-500/50' : 'border-emerald-500/30'
                         }`}
                       />
                       {errors.endDate && (
-                        <p className="mt-1 text-sm text-red-400">{errors.endDate.message}</p>
+                        <p className="mt-1 text-xs sm:text-sm text-red-400">{errors.endDate.message}</p>
                       )}
                     </div>
                   </div>
@@ -331,23 +374,53 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                       Trip Location (Optional)
                     </label>
                     <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={locationInput}
-                          onChange={(e) => setLocationInput(e.target.value)}
-                          placeholder="Search for a location..."
-                          className="flex-1 px-3 py-2 border border-emerald-500/30 rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
-                          onKeyPress={(e) => e.key === 'Enter' && handleGetCoordinates()}
-                        />
+                      <div className="flex gap-2 relative">
+                        <div className="flex-1 relative">
+                          <input
+                            type="text"
+                            value={locationInput}
+                            onChange={(e) => handleLocationInputChange(e.target.value)}
+                            placeholder="Search for a location..."
+                            className="w-full px-3 py-2 border border-emerald-500/30 rounded-md bg-slate-800/50 text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                            onKeyPress={(e) => e.key === 'Enter' && handleGetCoordinates()}
+                          />
+                          
+                          {/* Suggestions Dropdown */}
+                          {suggestions.length > 0 && locationInput.trim() && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-emerald-500/30 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
+                              {suggestions.map((suggestion, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => handleSuggestionSelect(suggestion)}
+                                  className="w-full text-left px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-500/20 active:bg-emerald-500/30 transition-colors border-b border-emerald-500/10 last:border-b-0 flex items-center gap-2"
+                                >
+                                  <FaMapPin className="h-3 w-3 text-emerald-400 flex-shrink-0" />
+                                  <span className="truncate">{suggestion.display_name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Loading Suggestions */}
+                          {isLoadingSuggestions && locationInput.trim() && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-emerald-500/30 rounded-md p-3 z-50">
+                              <div className="flex items-center gap-2 text-sm text-emerald-200">
+                                <FaSpinner className="animate-spin h-4 w-4" />
+                                Searching locations...
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         <button
                           type="button"
                           onClick={handleGetCoordinates}
-                          disabled={isGeocodingLoading}
-                          className="px-3 py-2 sm:px-4 sm:py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 disabled:opacity-50 transition-all duration-75 flex items-center gap-2 font-medium min-h-[44px]"
+                          disabled={isGeocodingLoading || !locationInput.trim()}
+                          className="px-3 py-2 sm:px-4 sm:py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 active:bg-emerald-800 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-75 flex items-center gap-2 font-medium min-h-[44px]"
                         >
                           {isGeocodingLoading ? <FaSpinner className="animate-spin" /> : <FaMapPin />}
-                          Add
+                          <span className="hidden sm:inline">Add</span>
                         </button>
                       </div>
 

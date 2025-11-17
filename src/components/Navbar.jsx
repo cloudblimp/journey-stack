@@ -3,13 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { FaSuitcase, FaMap, FaUser, FaCogs, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaSuitcase, FaMap, FaUser, FaCogs, FaSignOutAlt, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -55,9 +56,10 @@ export default function Navbar() {
           {/* Navigation Links */}
           {currentUser && (
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Desktop Links (hidden on mobile) */}
               <Link
                 to="/"
-                className={`hidden sm:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
+                className={`hidden md:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
                   isActive('/') 
                     ? 'text-white font-semibold bg-white/20'
                     : 'text-white hover:bg-white/10 active:bg-white/20'
@@ -69,7 +71,7 @@ export default function Navbar() {
               
               <Link
                 to="/map"
-                className={`hidden sm:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
+                className={`hidden md:flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
                   isActive('/map')
                     ? 'text-white font-semibold bg-white/20'
                     : 'text-white hover:bg-white/10 active:bg-white/20'
@@ -78,6 +80,51 @@ export default function Navbar() {
                 <FaMap className="h-4 w-4" />
                 <span className="hidden sm:inline">Map View</span>
               </Link>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden flex items-center justify-center h-10 w-10 rounded-md text-white hover:bg-white/10 active:bg-white/20 transition-all duration-75 active:scale-95"
+              >
+                {mobileMenuOpen ? (
+                  <FaTimes className="h-5 w-5" />
+                ) : (
+                  <FaBars className="h-5 w-5" />
+                )}
+              </button>
+
+              {/* Mobile Navigation Menu */}
+              {mobileMenuOpen && (
+                <div className="md:hidden absolute top-14 left-0 right-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg border-t border-white/10 z-40">
+                  <div className="px-3 py-3 space-y-1">
+                    <Link
+                      to="/"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center space-x-3 px-3 py-3 rounded-md text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
+                        isActive('/')
+                          ? 'text-white font-semibold bg-white/20'
+                          : 'text-white hover:bg-white/10 active:bg-white/20'
+                      }`}
+                    >
+                      <FaSuitcase className="h-4 w-4" />
+                      <span>My Trips</span>
+                    </Link>
+                    
+                    <Link
+                      to="/map"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center space-x-3 px-3 py-3 rounded-md text-sm font-medium min-h-[44px] transition-all duration-75 active:scale-95 ${
+                        isActive('/map')
+                          ? 'text-white font-semibold bg-white/20'
+                          : 'text-white hover:bg-white/10 active:bg-white/20'
+                      }`}
+                    >
+                      <FaMap className="h-4 w-4" />
+                      <span>Map View</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               {/* User Menu with Headless UI */}
               <Menu as="div" className="relative ml-3">
