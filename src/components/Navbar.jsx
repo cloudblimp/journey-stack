@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Menu, Transition } from '@headlessui/react';
@@ -11,6 +11,21 @@ export default function Navbar() {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hasModalOpen, setHasModalOpen] = useState(false);
+
+  // Detect when modals are open
+  useEffect(() => {
+    const checkModals = () => {
+      const modals = document.querySelectorAll('[role="dialog"], .fixed.inset-0.bg-slate-900');
+      setHasModalOpen(modals.length > 0);
+    };
+
+    checkModals();
+    const observer = new MutationObserver(checkModals);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => observer.disconnect();
+  }, []);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -36,7 +51,7 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg sticky top-0 z-50">
+    <nav className={`bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg sticky top-0 z-40 transition-all duration-200 ${hasModalOpen ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100'}`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           {/* Logo / App Name */}
@@ -95,7 +110,7 @@ export default function Navbar() {
 
               {/* Mobile Navigation Menu */}
               {mobileMenuOpen && (
-                <div className="md:hidden absolute top-14 left-0 right-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg border-t border-white/10 z-40">
+                <div className="md:hidden absolute top-14 left-0 right-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg border-t border-white/10 z-30">
                   <div className="px-3 py-3 space-y-1">
                     <Link
                       to="/"
@@ -129,7 +144,9 @@ export default function Navbar() {
               {/* User Menu with Headless UI */}
               <Menu as="div" className="relative ml-3">
                 <div>
-                  <Menu.Button className="h-10 w-10 sm:h-8 sm:w-8 rounded-full bg-white text-emerald-600 flex items-center justify-center text-sm font-medium hover:bg-white/90 active:bg-white/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-75">
+                  <Menu.Button 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="h-10 w-10 sm:h-8 sm:w-8 rounded-full bg-white text-emerald-600 flex items-center justify-center text-sm font-medium hover:bg-white/90 active:bg-white/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-75">
                     {userInitial}
                   </Menu.Button>
                 </div>
@@ -142,7 +159,7 @@ export default function Navbar() {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <Menu.Items className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 z-10">
+                  <Menu.Items className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 z-50">
                     {/* User Email Header */}
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Signed in as</p>
