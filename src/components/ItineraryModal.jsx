@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FaTimes, FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import AddActivityModal from './AddActivityModal';
 import EditActivityModal from './EditActivityModal';
@@ -11,6 +11,18 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [checkedEntries, setCheckedEntries] = useState({});
   const { createActivity } = useActivities();
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const activityTypes = [
     { icon: '↗', label: 'Activity', color: 'bg-blue-100 text-blue-700' },
@@ -145,24 +157,24 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900/95 rounded-xl max-w-6xl w-full max-h-[95vh] overflow-hidden flex flex-col border border-emerald-500/30 backdrop-blur-xl shadow-2xl">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-slate-900/95 rounded-xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col border border-emerald-500/30 backdrop-blur-xl shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-emerald-500/20">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Trip Itinerary</h1>
-            <p className="text-sm text-emerald-200/70 mt-1">Plan your daily activities and keep track of your schedule</p>
+        <div className="flex items-center justify-between p-3 sm:p-6 border-b border-emerald-500/20">
+          <div className="flex-1">
+            <h1 className="text-lg sm:text-2xl font-bold text-white">Trip Itinerary</h1>
+            <p className="text-xs sm:text-sm text-emerald-200/70 mt-1">Plan your daily activities and keep track of your schedule</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-emerald-500/10 rounded-lg text-emerald-400/60 hover:text-emerald-400 transition-colors">
-            <FaTimes className="text-xl" />
+          <button onClick={onClose} className="p-2 hover:bg-emerald-500/10 rounded-lg text-emerald-400/60 hover:text-emerald-400 transition-colors flex-shrink-0">
+            <FaTimes className="text-lg sm:text-xl" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="flex flex-1 gap-6 p-6 overflow-hidden">
-          {/* Sidebar */}
-          <div className="w-64 border-r border-emerald-500/20 pr-6 overflow-y-auto">
-            <h3 className="font-semibold text-emerald-100 mb-4 text-sm uppercase">Trip Days</h3>
+        {/* Body - Responsive Layout */}
+        <div className="flex flex-col lg:flex-row flex-1 gap-0 lg:gap-6 p-3 sm:p-6 overflow-y-auto">
+          {/* Sidebar - Hidden on mobile, shown as tabs */}
+          <div className="hidden lg:block w-64 border-r border-emerald-500/20 pr-6 overflow-y-auto">
+            <h3 className="font-semibold text-emerald-100 mb-4 text-xs sm:text-sm uppercase">Trip Days</h3>
             <div className="space-y-2">
               {tripDays.map((day, index) => {
                 const dayKey = formatDateToKey(day);
@@ -177,7 +189,7 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                       isSelected ? 'bg-emerald-500/20 border-2 border-emerald-500' : 'border-2 border-emerald-500/20 hover:bg-emerald-500/10 hover:border-emerald-500/40'
                     }`}
                   >
-                    <div className="font-semibold text-white">Day {index + 1}</div>
+                    <div className="font-semibold text-white text-sm">Day {index + 1}</div>
                     <div className="text-xs text-emerald-200/70 mt-1">
                       {day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
@@ -189,15 +201,60 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-white">Day {selectedDayIndex + 1}</h2>
-                <p className="text-sm text-emerald-200/70">{formatDayOfWeek(currentDay)}, {formatDate(currentDay)}</p>
-                <p className="text-sm text-emerald-200/50 mt-1">{currentDayActivities.length} activities planned</p>
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+            {/* Day Selector - Mobile Only */}
+            <div className="lg:hidden mb-4">
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  onClick={handlePrevDay}
+                  disabled={selectedDayIndex === 0}
+                  className="p-2 hover:bg-emerald-500/10 rounded-lg disabled:opacity-50 text-emerald-400 hover:text-emerald-300 transition-colors flex-shrink-0"
+                >
+                  <FaChevronLeft className="text-lg" />
+                </button>
+
+                {/* Horizontal Day Scroll - Mobile */}
+                <div className="flex-1 overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-2 pb-2">
+                    {tripDays.map((day, index) => {
+                      const isSelected = selectedDayIndex === index;
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedDayIndex(index)}
+                          className={`px-3 py-2 rounded-lg text-xs font-medium flex-shrink-0 transition-all whitespace-nowrap ${
+                            isSelected
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-emerald-500/20 text-emerald-100 hover:bg-emerald-500/30'
+                          }`}
+                        >
+                          Day {index + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleNextDay}
+                  disabled={selectedDayIndex === tripDays.length - 1}
+                  className="p-2 hover:bg-emerald-500/10 rounded-lg disabled:opacity-50 text-emerald-400 hover:text-emerald-300 transition-colors flex-shrink-0"
+                >
+                  <FaChevronRight className="text-lg" />
+                </button>
+              </div>
+            </div>
+
+            {/* Day Header */}
+            <div className="flex items-center justify-between mb-3 sm:mb-6">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-semibold text-white truncate">Day {selectedDayIndex + 1}</h2>
+                <p className="text-xs sm:text-sm text-emerald-200/70">{formatDayOfWeek(currentDay)}, {formatDate(currentDay)}</p>
+                <p className="text-xs text-emerald-200/50 mt-1">{currentDayActivities.length} activities planned</p>
               </div>
 
-              <div className="flex gap-2">
+              {/* Navigation Buttons - Desktop Only */}
+              <div className="hidden lg:flex gap-2 flex-shrink-0">
                 <button
                   onClick={handlePrevDay}
                   disabled={selectedDayIndex === 0}
@@ -217,14 +274,14 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
 
             <button 
               onClick={() => setIsAddActivityModalOpen(true)}
-              className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 active:bg-emerald-800 mb-6 w-fit transition-colors font-medium">
+              className="inline-flex items-center px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 active:bg-emerald-800 mb-3 sm:mb-6 w-fit transition-colors font-medium text-sm sm:text-base min-h-10 sm:min-h-11">
               <FaPlus className="mr-2 h-4 w-4" /> Add Activity
             </button>
 
-            {/* Activities */}
-            <div className="flex-1 overflow-y-auto space-y-3">
+            {/* Activities List */}
+            <div className="flex-1 overflow-y-auto space-y-2 sm:space-y-3">
               {currentDayActivities.length === 0 ? (
-                <p className="text-emerald-200/50 text-center py-8">No activities for this day</p>
+                <p className="text-emerald-200/50 text-center py-8 text-sm">No activities for this day</p>
               ) : (
                 currentDayActivities.map((activity) => {
                   const time = new Date(activity.dateTime).toLocaleTimeString('en-US', {
@@ -237,12 +294,12 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                   const activityType = activityTypes.find(t => t.label === activity.type) || activityTypes[0];
 
                   return (
-                    <div key={activity.id} className="border border-emerald-500/30 rounded-lg p-4 flex gap-4 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                    <div key={activity.id} className="border border-emerald-500/30 rounded-lg p-2 sm:p-4 flex gap-2 sm:gap-4 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
                       <input 
                         type="checkbox" 
                         checked={isChecked}
                         onChange={() => handleCheckboxChange(activity.id)}
-                        className="mt-1 w-5 h-5 cursor-pointer accent-emerald-500" 
+                        className="mt-1 w-4 h-4 sm:w-5 sm:h-5 cursor-pointer accent-emerald-500 flex-shrink-0" 
                       />
                       <button
                         onClick={() => {
@@ -251,10 +308,10 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                           setIsEditActivityModalOpen(true);
                         }}
                         type="button"
-                        className="flex-1 text-left hover:opacity-80 transition-opacity"
+                        className="flex-1 text-left hover:opacity-80 transition-opacity min-w-0"
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`px-2 py-1 text-xs font-semibold rounded flex items-center gap-1 ${
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1 flex-wrap">
+                          <span className={`px-2 py-1 text-xs font-semibold rounded flex items-center gap-1 flex-shrink-0 ${
                             activity.type === 'Activity' ? 'bg-cyan-500/30 text-cyan-200' :
                             activity.type === 'Accommodation' ? 'bg-amber-500/30 text-amber-200' :
                             activity.type === 'Food & Dining' ? 'bg-orange-500/30 text-orange-200' :
@@ -262,13 +319,13 @@ export default function ItineraryModal({ isOpen, onClose, trip, activities = [] 
                             'bg-emerald-500/30 text-emerald-200'
                           }`}>
                             <span>{activityType.icon}</span>
-                            <span>{activityType.label}</span>
+                            <span className="hidden sm:inline">{activityType.label}</span>
                           </span>
-                          <span className="text-sm text-emerald-200/70">{time}</span>
+                          <span className="text-xs sm:text-sm text-emerald-200/70">{time}</span>
                         </div>
-                        <h4 className={`font-semibold text-white ${isChecked ? 'line-through text-emerald-200/50' : ''}`}>{activity.title}</h4>
-                        {activity.description && <p className="text-sm text-emerald-200/70 mt-2">{activity.description}</p>}
-                        {activity.location && <p className="text-sm text-emerald-200/70 mt-2">📍 {activity.location}</p>}
+                        <h4 className={`font-semibold text-white text-sm sm:text-base break-words ${isChecked ? 'line-through text-emerald-200/50' : ''}`}>{activity.title}</h4>
+                        {activity.description && <p className="text-xs sm:text-sm text-emerald-200/70 mt-2 break-words">{activity.description}</p>}
+                        {activity.location && <p className="text-xs sm:text-sm text-emerald-200/70 mt-2 break-words">📍 {activity.location}</p>}
                       </button>
                     </div>
                   );

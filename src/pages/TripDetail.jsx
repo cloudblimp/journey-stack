@@ -70,7 +70,8 @@ export default function TripDetail() {
           const tripData = snapshot.data();
           // Verify the trip belongs to the current user
           if (tripData.userId === currentUser.uid) {
-            setTrip(tripData);
+            // Add the document ID to the trip data
+            setTrip({ id: snapshot.id, ...tripData });
           } else {
             setTrip(null); // Trip doesn't belong to this user
           }
