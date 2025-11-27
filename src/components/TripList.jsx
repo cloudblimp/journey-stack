@@ -57,9 +57,9 @@ export default function TripList({ trips = [], isLoading = false, onCreateTrip, 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div class="text-white">
-            <h1 class="text-2xl sm:text-3xl font-bold">My Travel Journeys</h1>
-            <p class="mt-1 sm:mt-2 text-sm sm:text-base opacity-80">
+          <div className="text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold">My Travel Journeys</h1>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base opacity-80">
               Document your adventures around the world
             </p>
           </div>

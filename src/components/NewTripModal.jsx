@@ -37,6 +37,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
   const [suggestions, setSuggestions] = useState([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const debounceTimerRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   const {
     register,
@@ -210,7 +211,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
           <div className="fixed inset-0 bg-black bg-opacity-25" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
+        <div className="fixed inset-0">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={React.Fragment}
@@ -221,7 +222,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-sm sm:max-w-lg transform overflow-hidden rounded-xl bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 text-left align-middle shadow-2xl transition-all mx-4 sm:mx-0">
+              <Dialog.Panel className="w-full max-w-sm sm:max-w-lg transform rounded-xl bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 text-left align-middle shadow-2xl transition-all mx-4 sm:mx-0 flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/20">
                   <Dialog.Title className="text-lg font-semibold text-white">
@@ -235,8 +236,16 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                   </button>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit(onFormSubmit)} className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
+                {/* Scrollable Form Container */}
+                <div 
+                  ref={scrollContainerRef}
+                  className="flex-1 overflow-y-auto overscroll-contain" 
+                  style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+                >
+                <form
+                  onSubmit={handleSubmit(onFormSubmit)}
+                  className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5"
+                >
                   {/* Title */}
                   <div>
                     <label className="block text-sm font-medium text-emerald-100 mb-1">
@@ -481,6 +490,7 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
                     </button>
                   </div>
                 </form>
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
