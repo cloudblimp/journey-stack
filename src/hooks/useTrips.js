@@ -67,7 +67,21 @@ export function useTrips() {
       };
 
       const docRef = await addDoc(collection(db, 'trips'), tripDataDoc);
-      return { id: docRef.id, ...tripDataDoc };
+      
+      // Return trip with serialized timestamps instead of Firebase objects
+      return { 
+        id: docRef.id, 
+        title,
+        destination,
+        startDate,
+        endDate,
+        description,
+        coverImage: coverImageUrl,
+        locations: locations || [],
+        userId: currentUser.uid,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
     } catch (err) {
       setError(err.message);
       throw err;

@@ -196,6 +196,10 @@ export default function NewTripModal({ isOpen, onClose, onCreateTrip, isLoading,
     onClose();
   };
 
+  const handleWheel = (e) => {
+    // Wheel event handler - browser will handle scroll naturally
+  };
+
   return (
     <Transition show={isOpen} as={React.Fragment}>
       <Dialog as="div" className="relative z-40" onClose={handleCloseModal}>
