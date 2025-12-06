@@ -18,10 +18,10 @@
 👉 **Read This:** [`src/test/TEST_SUMMARY.md`](./src/test/TEST_SUMMARY.md)
 
 ### For Complete Test List
-👉 **Reference:** [`TEST_CASES.md`](./TEST_CASES.md)
+👉 **Reference:** [`src/test/TEST_CASES.md`](./src/test/TEST_CASES.md)
 
 ### For Implementation Details
-👉 **Full Report:** [`TEST_IMPLEMENTATION_REPORT.md`](./TEST_IMPLEMENTATION_REPORT.md)
+👉 **Full Report:** [`src/test/TEST_IMPLEMENTATION_REPORT.md`](./src/test/TEST_IMPLEMENTATION_REPORT.md)
 
 ---
 
@@ -87,18 +87,24 @@ npm run test:coverage
 
 ```
 project-root/
-├── TEST_CASES.md                    ← Test inventory
-├── TEST_IMPLEMENTATION_REPORT.md    ← Full report
+├── README_TESTS.md                      ← This file (index & quick links)
 ├── src/
 │   ├── test/
-│   │   ├── setupTests.js            ← Global setup
-│   │   ├── TEST_SUMMARY.md          ← Comprehensive guide
-│   │   └── QUICK_START.md           ← Quick reference
-│   ├── components/__tests__/        ← Component tests
-│   ├── hooks/__tests__/             ← Hook tests
-│   ├── utils/__tests__/             ← Utility tests
-│   └── contexts/__tests__/          ← Context tests
-└── vite.config.js                   ← Updated with test config
+│   │   ├── setupTests.js                ← Global test setup & mocks
+│   │   ├── TEST_SUMMARY.md              ← Comprehensive testing guide
+│   │   ├── TEST_CASES.md                ← Complete test inventory
+│   │   ├── TEST_IMPLEMENTATION_REPORT.md ← Full implementation report
+│   │   └── QUICK_START.md               ← Quick reference guide
+│   ├── components/__tests__/            ← Component tests
+│   │   ├── Navbar.test.jsx
+│   │   └── TripCard.test.jsx
+│   ├── hooks/__tests__/                 ← Hook tests
+│   │   └── useTrips.test.js
+│   ├── utils/__tests__/                 ← Utility tests
+│   │   └── dateUtils.test.js
+│   └── contexts/__tests__/              ← Context tests
+│       └── contexts.test.js
+└── vite.config.js                       ← Updated with test config
 ```
 
 ---
@@ -187,9 +193,23 @@ npm run test:coverage
 
 ✅ **39 Tests** covering key functionalities  
 ✅ **5 Test Files** with 100% pass rate  
-✅ **4 Documentation Files** for reference  
+✅ **5 Documentation Files** for reference  
 ✅ **0 Configuration** needed - ready to use  
 ✅ **CI/CD Ready** for GitHub Actions  
+
+---
+
+## Documentation Files Location
+
+All test documentation is in `src/test/`:
+
+| File | Purpose |
+|------|---------|
+| `src/test/QUICK_START.md` | Quick commands and setup reference |
+| `src/test/TEST_SUMMARY.md` | Comprehensive testing guide |
+| `src/test/TEST_CASES.md` | Complete test inventory |
+| `src/test/TEST_IMPLEMENTATION_REPORT.md` | Full implementation details |
+| `src/test/setupTests.js` | Global test setup and Firebase mocks |
 
 ---
 
