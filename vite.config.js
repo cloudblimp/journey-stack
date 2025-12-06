@@ -21,5 +21,24 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 600
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setupTests.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/',
+        'vite.config.*',
+        'src/main.*',
+        'src/firebase/**',
+        'src/config/**',
+        '**/*.css',
+        '**/__tests__/**',
+      ],
+    },
   }
 })

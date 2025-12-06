@@ -39,8 +39,8 @@ try {
   if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
     try {
       // Connect to Firestore emulator
-      connectFirestoreEmulator(db, 'localhost', 8080);
-      console.log('Connected to Firebase Firestore emulator at localhost:8080');
+      connectFirestoreEmulator(db, 'localhost', 8085);
+      console.log('Connected to Firebase Firestore emulator at localhost:8085');
       
       // default storage emulator host/port is localhost:9199
       connectStorageEmulator(storage, 'localhost', 9199);
